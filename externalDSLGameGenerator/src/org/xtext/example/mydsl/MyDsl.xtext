@@ -1,0 +1,162 @@
+grammar org.xtext.example.mydsl.MyDsl with org.eclipse.xtext.common.Terminals
+
+generate myDsl "http://www.xtext.org/example/mydsl/MyDsl"
+
+GameWorld:
+	'GameWorld' name=ID ':' elements+=Element*
+;
+
+Element:
+	GameRule | Entity 
+;
+
+GameRule returns Element:
+	'GameRules:' rules+=Rule*
+;
+
+Rule:
+	'Time' '=' INT 
+	('if' Condition=Logic 'then' action=Action)?
+	/*
+	
+	Player '.' Var=health <= 0) then GameOver' |
+	'if(Time <= 0) then GameOver' |
+	'if(WinCondition == true) then GameOver' |
+	'if(Item.durability <= 0) then remove Item' |
+	'WinCondition = reach northern_tower_level_2 && carry key */
+	
+;
+
+Action:
+	GameWorld = 'GameOver'
+;
+
+Entity returns Element:
+	'create' type=Type  
+;
+
+EntityName:
+	value=STRING
+;
+
+Type:
+	Room | Item | NPC | Player 
+;
+
+Room:
+	'room' name=ID entityName=EntityName ':' roomAttributes+=RoomAttribute* 
+;
+
+RoomAttribute:
+	PathList | ItemList | NPCList
+;
+
+PathList:
+	'paths' '=' pathList+=Path (','? pathList+=Path)*
+;
+
+ItemList:
+	'items' '=' itemList+=[Item] (','? itemList+=[Item])* 
+;
+
+NPCList:
+	'npcs' '=' npcList+=[NPC] (','? npcList+=[NPC])*
+;
+
+Path:
+	toType=[Room]
+	'through' entityName=EntityName 
+	'requires'? requireItem=[Item]?
+;
+
+Item:
+	'item' name=ID entityName=EntityName (':' itemType=[Item])? 
+	attributes+=Attribute*
+;
+
+Player:
+	'player' name=ID entityName=EntityName (':' playerType=[Player])?
+	attributes+=Attribute*
+;
+
+NPC:
+	'npc' name=ID entityName=EntityName (':' npcType=[NPC])?
+	attributes+=Attribute*
+;
+
+Var:
+	type=[Type] '.' attribute=ID //[Attribute] istedet for ID
+;
+
+Attribute:
+	Health | Weight | Damage | Durability | CarryCapacity | Escapeable
+;
+
+Health:
+	'health' '=' health=Constant
+;
+
+//Obtainable:
+//	'obtainable' '='? (obtainable?='true' | obtainable?='false')
+//;
+
+
+Weight:
+	'weight' '=' weight=INT 
+;
+
+Damage:
+	'damage' '=' damage=INT
+;
+
+Durability:
+	'durability' '=' durability=INT
+;
+
+CarryCapacity:
+	'carryCapacity' '=' carryCapacity=INT
+;
+
+Escapeable:
+	'escapeable' '=' (escapeable?='true' | escapeable?='false') 
+;
+
+//Logic Expressions
+
+Logic returns LogicExp:
+	Conjunction ('||' {Or.left=current} right=Conjunction)*
+;
+
+Conjunction returns LogicExp:
+	PrimLogic ('&&' {And.left=current} right=PrimLogic)*
+;
+
+PrimLogic returns LogicExp:
+	Comparison | '[' logic=Logic ']'
+;
+
+
+Comparison:
+	left=Exp op=CompareOp right=Exp
+;
+
+CompareOp:
+	'<' | '>' | '==' | '<=' | '>='
+;
+
+Exp returns Expression:
+	Factor (('+' {Plus.left=current}| '-' {Minus.left=current}) right=Factor)*
+;
+
+Factor returns Expression:
+	PrimExp (('*' {Mult.left=current} | '/' {Div.left=current}) right=PrimExp)*
+;
+
+PrimExp returns Expression:
+	Var | Constant | '(' exp=Exp ')'
+;
+
+Constant:
+	value=INT
+;
+
