@@ -1,0 +1,13 @@
+src-gen/
+bin/
+test-bin/
+local.properties
+build/
+xtend-gen/
+.settings/
+*.jar
+tmp/
+target/
+.launch
+.metadata
+model/
