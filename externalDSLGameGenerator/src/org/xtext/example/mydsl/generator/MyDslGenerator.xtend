@@ -34,7 +34,12 @@ import org.xtext.example.mydsl.myDsl.Path
 import org.xtext.example.mydsl.myDsl.RoomAttribute
 import org.xtext.example.mydsl.myDsl.PathList
 import org.xtext.example.mydsl.myDsl.ItemList
-import org.xtext.example.mydsl.myDsl.NPCList
+import org.xtext.example.mydsl.myDsl.HostileNPC
+import org.xtext.example.mydsl.myDsl.Weapon
+import org.xtext.example.mydsl.myDsl.WeaponList
+import org.xtext.example.mydsl.myDsl.Aggressive
+import org.xtext.example.mydsl.myDsl.Element
+import org.xtext.example.mydsl.myDsl.Type
 
 /**
  * Generates code from your model files on save.
@@ -44,22 +49,62 @@ import org.xtext.example.mydsl.myDsl.NPCList
 class MyDslGenerator extends AbstractGenerator {
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
+
+		BoilerPlateShit.generateBoilerPlateCode(fsa);
+
 		for (e : resource.allContents.toIterable.filter(Player)) {
 			fsa.generateFile("gameDSL/" + e.name.toFirstUpper + ".java", e.playerCompile)
 		}
 		for (e : resource.allContents.toIterable.filter(NPC)) {
 			fsa.generateFile("gameDSL/" + e.name.toFirstUpper + ".java", e.npcCompile)
 		}
+		for (e : resource.allContents.toIterable.filter(HostileNPC)) {
+			fsa.generateFile("gameDSL/" + e.name.toFirstUpper + ".java", e.hostileNpcCompile)
+		}
 		for (e : resource.allContents.toIterable.filter(Item)) {
 			fsa.generateFile("gameDSL/" + e.name.toFirstUpper + ".java", e.itemCompile)
 		}
+		for (e : resource.allContents.toIterable.filter(Weapon)) {
+			fsa.generateFile("gameDSL/" + e.name.toFirstUpper + ".java", e.weaponCompile)
+		}
 		for (e : resource.allContents.toIterable.filter(Room)) {
 			fsa.generateFile("gameDSL/" + e.name.toFirstUpper + ".java", e.roomCompile)
+		}
+		for (e : resource.allContents.toIterable.filter(GameWorld)) {
+			fsa.generateFile("gameDSL/EntityGenerator.java", e.gameWorldCompile)
 		}
 
 	/*val GameGenerator = resource.allContents.filter(GameWorld).next
 
 	 System::out.println(GameGenerator.generate)*/
+	}
+
+	def CharSequence gameWorldCompile(GameWorld gameWorld) {
+		'''
+			package gameDSL;
+			
+			import java.util.ArrayList;
+			
+			public class EntityGenerator{
+			
+				public static ArrayList<Room> generateRooms() {
+					ArrayList<Room> rooms = new ArrayList<>();
+					
+			«FOR a : gameWorld.elements.filter(Element)»
+				
+									rooms.add(«a.equals(Room)».getInstance());
+			«ENDFOR»
+			
+			     	for (Room room : rooms) {
+			     	  	room.setPaths();
+			     	  	room.setItems();
+			     	}
+			
+			    	 return rooms;
+			 	}
+			 }
+		'''
+
 	}
 
 	def CharSequence roomCompile(Room room) {
@@ -91,15 +136,13 @@ class MyDslGenerator extends AbstractGenerator {
 				}
 				public void setItems() {
 					«FOR a : room.roomAttributes.filter(RoomAttribute).filter(ItemList)»
-						 «FOR b: a.itemList.filter(Item)»
-						 items.add(new «b.name.toFirstUpper»());	
+						«FOR b: a.itemList.filter(Item)»
+							items.add(new «b.name.toFirstUpper»());	
 						«ENDFOR»	
 					«ENDFOR»
-				}
-				public void setNPCs() {
-					«FOR a : room.roomAttributes.filter(RoomAttribute).filter(NPCList)»
-						 «FOR b: a.npcList.filter(NPC)»
-						 npcs.add(new «b.name.toFirstUpper»());	
+					«FOR a : room.roomAttributes.filter(RoomAttribute).filter(WeaponList)»
+						«FOR b: a.weaponsList.filter(Weapon)»
+							items.add(new «b.name.toFirstUpper»());	
 						«ENDFOR»	
 					«ENDFOR»
 				}
@@ -113,14 +156,33 @@ class MyDslGenerator extends AbstractGenerator {
 			public class «item.name.toFirstUpper» extends Item {
 				
 				public «item.name.toFirstUpper»() {
-					super("«item.entityName.value»", 
+					super("«item.entityName.value»"
 					«FOR a : item.attributes.filter(Attribute).filter(Weight)»
+						«IF a!==null»
+							, «a.weight»
+						«ENDIF»
+					«ENDFOR»
+					);
+			
+				}
+			}
+		'''
+	}
+
+	def CharSequence weaponCompile(Weapon weapon) {
+		'''
+			package gameDSL;
+			public class «weapon.name.toFirstUpper» extends Weapon {
+				
+				public «weapon.name.toFirstUpper»() {
+					super("«weapon.entityName.value»", 
+					«FOR a : weapon.attributes.filter(Attribute).filter(Weight)»
 						«a.weight»
 					«ENDFOR»,
-					«FOR a : item.attributes.filter(Attribute).filter(Damage)»
+					«FOR a : weapon.attributes.filter(Attribute).filter(Damage)»
 						«a.damage»
 					«ENDFOR»,
-					«FOR a : item.attributes.filter(Attribute).filter(Durability)»
+					«FOR a : weapon.attributes.filter(Attribute).filter(Durability)»
 						«a.durability»
 					«ENDFOR»
 					);
@@ -135,16 +197,33 @@ class MyDslGenerator extends AbstractGenerator {
 			package gameDSL;
 			public class «npc.name.toFirstUpper» extends NPC {
 				
-				public «npc.name.toFirstUpper»() {
-					super("«npc.entityName.value»", 
-					«FOR a : npc.attributes.filter(Attribute).filter(Escapeable)»
+				public «npc.name.toFirstUpper»(Room currentRoom) {
+					super(currentRoom, "«npc.entityName.value»");
+				}
+			}
+		'''
+	}
+
+	def CharSequence hostileNpcCompile(HostileNPC hostileNpc) {
+		'''
+			package gameDSL;
+			public class «hostileNpc.name.toFirstUpper» extends HostileNPC {
+				
+				public «hostileNpc.name.toFirstUpper»(Room currentRoom) {
+					super(currentRoom, "«hostileNpc.entityName.value»", 
+					«FOR a : hostileNpc.attributes.filter(Attribute).filter(Escapeable)»
 						«a.escapeable»
 					«ENDFOR»,
-					«FOR a : npc.attributes.filter(Attribute).filter(Health)»
+					«FOR a : hostileNpc.attributes.filter(Attribute).filter(Health)»
 						«a.health.value»
 					«ENDFOR»,
-					«FOR a : npc.attributes.filter(Attribute).filter(Damage)»
+					«FOR a : hostileNpc.attributes.filter(Attribute).filter(Damage)»
 						«a.damage»
+					«ENDFOR»
+					«FOR a : hostileNpc.attributes.filter(Attribute).filter(Aggressive)»
+						«IF a.aggressive»
+							, true
+						«ENDIF»
 					«ENDFOR»);
 				
 				}
@@ -157,9 +236,9 @@ class MyDslGenerator extends AbstractGenerator {
 			package gameDSL;
 			public class «player.name.toFirstUpper» extends Player {
 				
-				public «player.name.toFirstUpper»() {
-					super("«player.entityName.value»", «FOR a : player.attributes.filter(Attribute).filter(Health)»
-																				«a.health.value»
+				public «player.name.toFirstUpper»(Room currentRoom) {
+					super(currentRoom, "«player.entityName.value»", «FOR a : player.attributes.filter(Attribute).filter(Health)»
+																																«a.health.value»
 					«ENDFOR»,
 					«FOR a : player.attributes.filter(Attribute).filter(CarryCapacity)»
 						«a.carryCapacity»
