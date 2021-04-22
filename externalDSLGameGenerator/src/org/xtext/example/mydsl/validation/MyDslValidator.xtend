@@ -13,6 +13,8 @@ import org.xtext.example.mydsl.myDsl.MyDslPackage
 import org.xtext.example.mydsl.myDsl.NPC
 import org.xtext.example.mydsl.myDsl.Player
 import org.xtext.example.mydsl.myDsl.Weight
+import org.xtext.example.mydsl.myDsl.HostileNPC
+import org.xtext.example.mydsl.myDsl.Weapon
 
 /**
  * This class contains custom validation rules. 
@@ -37,13 +39,26 @@ class MyDslValidator extends AbstractMyDslValidator {
 		item.attributes.forEach [
 			if (it instanceof Health)
 				error("Items do not have health try durability instead ", MyDslPackage.eINSTANCE.item_ItemType)
-
 			if (it instanceof CarryCapacity)
 				error("Items does not have carry capacity ", MyDslPackage.eINSTANCE.item_ItemType)
 			if (it instanceof Escapeable)
 				error("Items does not have escapeable", MyDslPackage.eINSTANCE.item_ItemType)
 		]
 	}
+
+	@Check
+	def checkWeaponAttributes(Weapon weapon) {
+
+		weapon.attributes.forEach [
+			if (it instanceof Health)
+				error("Weapons do not have health try durability instead ", MyDslPackage.eINSTANCE.weapon_WeaponType)
+			if (it instanceof CarryCapacity)
+				error("Weapons does not have carry capacity ", MyDslPackage.eINSTANCE.weapon_WeaponType)
+			if (it instanceof Escapeable)
+				error("Weapons does not have escapeable", MyDslPackage.eINSTANCE.weapon_WeaponType)
+		]
+	}
+
 	@Check
 	def checkPlayerAttribute(Player player) {
 
@@ -56,6 +71,7 @@ class MyDslValidator extends AbstractMyDslValidator {
 				error("Player does not have Escapeable", MyDslPackage.eINSTANCE.player_PlayerType)
 		]
 	}
+
 	@Check
 	def checkNPCAttribute(NPC npc) {
 
@@ -69,4 +85,16 @@ class MyDslValidator extends AbstractMyDslValidator {
 		]
 	}
 
+	@Check
+	def checkHostileNPCAttribute(HostileNPC hostileNPC) {
+
+		hostileNPC.attributes.forEach [
+			if (it instanceof Weight)
+				error("HostileNPC does not have weight ", MyDslPackage.eINSTANCE.hostileNPC_HostileNpcType)
+			if (it instanceof Durability)
+				error("HostileNPC does not have Durability", MyDslPackage.eINSTANCE.hostileNPC_HostileNpcType)
+			if (it instanceof CarryCapacity)
+				error("HostileNPC does not have CarryCapacity", MyDslPackage.eINSTANCE.hostileNPC_HostileNpcType)
+		]
+	}
 }

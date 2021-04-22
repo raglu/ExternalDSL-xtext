@@ -7,15 +7,15 @@ GameWorld:
 ;
 
 Element:
-	GameRule | Entity 
+	GameRule | GameEntity 
 ;
 
 GameRule returns Element:
-	'GameRules:' rules+=Rule*
+	{Element} 'GameRules:' rules+=Rule*
 ;
 
 Rule:
-	'Time' '=' INT 
+	{Rule} 'Time' '=' INT 
 	('if' Condition=Logic 'then' action=Action)?
 	/*
 	
@@ -31,7 +31,7 @@ Action:
 	GameWorld = 'GameOver'
 ;
 
-Entity returns Element:
+GameEntity returns Element:
 	'create' type=Type  
 ;
 
@@ -40,15 +40,15 @@ EntityName:
 ;
 
 Type:
-	Room | Item | NPC | Player 
+	Room | Item | Weapon | NPC | HostileNPC | Player 
 ;
 
 Room:
-	'room' name=ID entityName=EntityName ':' roomAttributes+=RoomAttribute* 
+	'room' name=ID entityName=EntityName roomAttributes+=RoomAttribute* 
 ;
 
 RoomAttribute:
-	PathList | ItemList | NPCList
+	PathList | ItemList | NPCList | WeaponList | HostileNPCList | PlayerList
 ;
 
 PathList:
@@ -59,8 +59,20 @@ ItemList:
 	'items' '=' itemList+=[Item] (','? itemList+=[Item])* 
 ;
 
+WeaponList:
+	'weapons' '=' weaponsList+=[Weapon] (','? weaponsList+=[Weapon])*
+;
+
 NPCList:
 	'npcs' '=' npcList+=[NPC] (','? npcList+=[NPC])*
+;
+
+HostileNPCList:
+	'hostileNpcs' '=' hostileNPCList+=[HostileNPC] (','? hostileNPCList+=[HostileNPC])*
+;
+
+PlayerList:
+	'players' '=' playerList+=[Player] (','? playerList+=[Player])*
 ;
 
 Path:
@@ -74,6 +86,11 @@ Item:
 	attributes+=Attribute*
 ;
 
+Weapon:
+	'weapon' name=ID entityName=EntityName (':' weaponType=[Weapon])? 
+	attributes+=Attribute*
+;
+
 Player:
 	'player' name=ID entityName=EntityName (':' playerType=[Player])?
 	attributes+=Attribute*
@@ -84,12 +101,17 @@ NPC:
 	attributes+=Attribute*
 ;
 
+HostileNPC:
+	'hostilenpc' name=ID entityName=EntityName (':' hostileNpcType=[HostileNPC])?
+	attributes+=Attribute*
+;
+
 Var:
 	type=[Type] '.' attribute=ID //[Attribute] istedet for ID
 ;
 
 Attribute:
-	Health | Weight | Damage | Durability | CarryCapacity | Escapeable
+	Health | Weight | Damage | Durability | CarryCapacity | Escapeable | Aggressive
 ;
 
 Health:
@@ -119,6 +141,10 @@ CarryCapacity:
 
 Escapeable:
 	'escapeable' '=' (escapeable?='true' | escapeable?='false') 
+;
+
+Aggressive:
+	'aggressive' '=' (aggressive?='true' | aggressive?='false') 
 ;
 
 //Logic Expressions
