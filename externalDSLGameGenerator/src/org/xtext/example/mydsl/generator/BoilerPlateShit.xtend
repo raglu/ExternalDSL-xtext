@@ -21,7 +21,7 @@ class BoilerPlateShit {
 
 	def static generateCommand(IFileSystemAccess2 fsa) {
 		fsa.generateFile(
-			"gameDSL/.java",
+			"gameDSL/Command.java",
 			'''
 				package gameDSL;
 				
@@ -49,7 +49,7 @@ class BoilerPlateShit {
 
 	def static generateGame(IFileSystemAccess2 fsa) {
 		fsa.generateFile(
-			"gameDSL/.java",
+			"gameDSL/Game.java",
 			'''
 			package gameDSL;
 			
@@ -333,7 +333,7 @@ class BoilerPlateShit {
 
 	def static generateHostileNPC(IFileSystemAccess2 fsa) {
 		fsa.generateFile(
-			"gameDSL/.java",
+			"gameDSL/HostileNPC.java",
 			'''
 			package gameDSL;
 			
@@ -404,7 +404,7 @@ class BoilerPlateShit {
 
 	def static generateItem(IFileSystemAccess2 fsa) {
 		fsa.generateFile(
-			"gameDSL/.java",
+			"gameDSL/Item.java",
 			'''
 			package gameDSL;
 			
@@ -437,7 +437,7 @@ class BoilerPlateShit {
 
 	def static generateMain(IFileSystemAccess2 fsa) {
 		fsa.generateFile(
-			"gameDSL/.java",
+			"gameDSL/Main.java",
 			'''
 			package gameDSL;
 			
@@ -453,7 +453,7 @@ class BoilerPlateShit {
 
 	def static generateNPC(IFileSystemAccess2 fsa) {
 		fsa.generateFile(
-			"gameDSL/.java",
+			"gameDSL/NPC.java",
 			'''
 			package gameDSL;
 			
@@ -489,7 +489,7 @@ class BoilerPlateShit {
 
 	def static generateParser(IFileSystemAccess2 fsa) {
 		fsa.generateFile(
-			"gameDSL/.java",
+			"gameDSL/Parser.java",
 			'''
 			package gameDSL;
 			
@@ -538,10 +538,9 @@ class BoilerPlateShit {
 		)
 	}
 
-
 	def static generatePath(IFileSystemAccess2 fsa) {
 		fsa.generateFile(
-			"gameDSL/.java",
+			"gameDSL/Path.java",
 			'''
 			package gameDSL;
 			
@@ -580,7 +579,7 @@ class BoilerPlateShit {
 
 	def static generatePlayer(IFileSystemAccess2 fsa) {
 		fsa.generateFile(
-			"gameDSL/.java",
+			"gameDSL/Player.java",
 			'''
 			package gameDSL;
 			
@@ -695,7 +694,7 @@ class BoilerPlateShit {
 
 	def static generateRoom(IFileSystemAccess2 fsa) {
 		fsa.generateFile(
-			"gameDSL/.java",
+			"gameDSL/Room.java",
 			'''
 			package gameDSL;
 			
@@ -814,7 +813,7 @@ class BoilerPlateShit {
 
 	def static generateWeapon(IFileSystemAccess2 fsa) {
 		fsa.generateFile(
-			"gameDSL/.java",
+			"gameDSL/Weapon.java",
 			'''
 			package gameDSL;
 			
