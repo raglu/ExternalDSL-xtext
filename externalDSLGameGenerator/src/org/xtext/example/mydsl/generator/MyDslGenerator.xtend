@@ -3,43 +3,44 @@
  */
 package org.xtext.example.mydsl.generator
 
+import org.eclipse.emf.common.util.EList
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
-import org.xtext.example.mydsl.myDsl.GameWorld
-import org.eclipse.emf.common.util.EList
-import org.xtext.example.mydsl.myDsl.Element
+import org.xtext.example.mydsl.myDsl.Aggressive
 import org.xtext.example.mydsl.myDsl.And
-import org.xtext.example.mydsl.myDsl.Or
-import org.xtext.example.mydsl.myDsl.Comparison
-import org.xtext.example.mydsl.myDsl.Plus
-import org.xtext.example.mydsl.myDsl.Minus
-import org.xtext.example.mydsl.myDsl.Mult
-import org.xtext.example.mydsl.myDsl.Div
-import org.xtext.example.mydsl.myDsl.Constant
-import org.xtext.example.mydsl.myDsl.Var
-import org.xtext.example.mydsl.myDsl.Player
-import org.xtext.example.mydsl.myDsl.Health
 import org.xtext.example.mydsl.myDsl.Attribute
 import org.xtext.example.mydsl.myDsl.CarryCapacity
-import org.xtext.example.mydsl.myDsl.NPC
-import org.xtext.example.mydsl.myDsl.Escapeable
+import org.xtext.example.mydsl.myDsl.Comparison
+import org.xtext.example.mydsl.myDsl.Constant
 import org.xtext.example.mydsl.myDsl.Damage
-import org.xtext.example.mydsl.myDsl.Item
-import org.xtext.example.mydsl.myDsl.Weight
+import org.xtext.example.mydsl.myDsl.Div
 import org.xtext.example.mydsl.myDsl.Durability
-import org.xtext.example.mydsl.myDsl.Room
-import org.xtext.example.mydsl.myDsl.Path
-import org.xtext.example.mydsl.myDsl.RoomAttribute
-import org.xtext.example.mydsl.myDsl.PathList
-import org.xtext.example.mydsl.myDsl.ItemList
+import org.xtext.example.mydsl.myDsl.Element
+import org.xtext.example.mydsl.myDsl.Escapeable
+import org.xtext.example.mydsl.myDsl.GameWorld
+import org.xtext.example.mydsl.myDsl.Health
 import org.xtext.example.mydsl.myDsl.HostileNPC
+import org.xtext.example.mydsl.myDsl.HostileNPCList
+import org.xtext.example.mydsl.myDsl.Item
+import org.xtext.example.mydsl.myDsl.ItemList
+import org.xtext.example.mydsl.myDsl.Minus
+import org.xtext.example.mydsl.myDsl.Mult
+import org.xtext.example.mydsl.myDsl.NPC
+import org.xtext.example.mydsl.myDsl.NPCList
+import org.xtext.example.mydsl.myDsl.Or
+import org.xtext.example.mydsl.myDsl.Path
+import org.xtext.example.mydsl.myDsl.PathList
+import org.xtext.example.mydsl.myDsl.Player
+import org.xtext.example.mydsl.myDsl.PlayerList
+import org.xtext.example.mydsl.myDsl.Plus
+import org.xtext.example.mydsl.myDsl.Room
+import org.xtext.example.mydsl.myDsl.RoomAttribute
+import org.xtext.example.mydsl.myDsl.Var
 import org.xtext.example.mydsl.myDsl.Weapon
 import org.xtext.example.mydsl.myDsl.WeaponList
-import org.xtext.example.mydsl.myDsl.Aggressive
-import org.xtext.example.mydsl.myDsl.Element
-import org.xtext.example.mydsl.myDsl.Type
+import org.xtext.example.mydsl.myDsl.Weight
 
 /**
  * Generates code from your model files on save.
@@ -90,9 +91,10 @@ class MyDslGenerator extends AbstractGenerator {
 				public static ArrayList<Room> generateRooms() {
 					ArrayList<Room> rooms = new ArrayList<>();
 					
-			«FOR a : gameWorld.elements.filter(Element)»
-				
-									rooms.add(«a.equals(Room)».getInstance());
+			«FOR a : gameWorld.elements.filter(Element).filter(GameEntity)»
+				«IF a.type instanceof Room»
+					rooms.add(«a.type.name.toFirstUpper».getInstance());
+				«ENDIF»
 			«ENDFOR»
 			
 			     	for (Room room : rooms) {
@@ -102,7 +104,46 @@ class MyDslGenerator extends AbstractGenerator {
 			
 			    	 return rooms;
 			 	}
-			 }
+			 
+			    public static ArrayList<Player> generatePlayers() {
+			         ArrayList<Player> players = new ArrayList<>();
+			         
+			«FOR a : gameWorld.elements.filter(Element).filter(GameEntity)»
+				«IF a.type instanceof Room»
+					«var room = a.type as Room»
+						«FOR b : room.roomAttributes.filter(PlayerList)»
+							«FOR c : b.playerList»
+								players.add(new «c.name.toFirstUpper»(«room.name.toFirstUpper».getInstance()));
+							«ENDFOR»
+						«ENDFOR»
+				«ENDIF»
+			 «ENDFOR»
+			 
+			       return players;
+			     }
+			 
+			 public static ArrayList<NPC> generateNPCs() {
+			         ArrayList<NPC> npcs = new ArrayList<>();
+			         
+			«FOR a : gameWorld.elements.filter(Element).filter(GameEntity)»
+				«IF a.type instanceof Room»
+					«var room = a.type as Room»
+						«FOR b : room.roomAttributes.filter(NPCList)»
+							«FOR c : b.npcList»
+								npcs.add(new «c.name.toFirstUpper»(«room.name.toFirstUpper».getInstance()));
+							«ENDFOR»
+						«ENDFOR»
+						«FOR b : room.roomAttributes.filter(HostileNPCList)»
+							«FOR c : b.hostileNPCList»
+								npcs.add(new «c.name.toFirstUpper»(«room.name.toFirstUpper».getInstance()));
+							«ENDFOR»
+						«ENDFOR»
+				«ENDIF»
+			 «ENDFOR»
+			 
+			       return npcs;
+			     }
+			}
 		'''
 
 	}
@@ -238,7 +279,7 @@ class MyDslGenerator extends AbstractGenerator {
 				
 				public «player.name.toFirstUpper»(Room currentRoom) {
 					super(currentRoom, "«player.entityName.value»", «FOR a : player.attributes.filter(Attribute).filter(Health)»
-																																«a.health.value»
+																																								«a.health.value»
 					«ENDFOR»,
 					«FOR a : player.attributes.filter(Attribute).filter(CarryCapacity)»
 						«a.carryCapacity»
