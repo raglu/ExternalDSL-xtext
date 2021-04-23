@@ -3,186 +3,142 @@ grammar org.xtext.example.mydsl.MyDsl with org.eclipse.xtext.common.Terminals
 generate myDsl "http://www.xtext.org/example/mydsl/MyDsl"
 
 GameWorld:
-	'GameWorld' name=ID ':' elements+=Element*
-;
+	'GameWorld' name=ID ':' elements+=Element*;
 
 Element:
-	GameRule | GameEntity 
-;
-
-GameRule returns Element:
-	{Element} 'GameRules:' rules+=Rule*
-;
-
-Rule:
-	{Rule} 'Time' '=' INT 
-	('if' Condition=Logic 'then' action=Action)?
-	/*
-	
-	Player '.' Var=health <= 0) then GameOver' |
-	'if(Time <= 0) then GameOver' |
-	'if(WinCondition == true) then GameOver' |
-	'if(Item.durability <= 0) then remove Item' |
-	'WinCondition = reach northern_tower_level_2 && carry key */
-	
-;
-
-Action:
-	GameWorld = 'GameOver'
-;
+	GameRule | GameEntity;
 
 GameEntity returns Element:
-	'create' type=Type  
-;
+	'create' type=Type;
 
 EntityName:
-	value=STRING
-;
+	value=STRING;
 
 Type:
-	Room | Item | Weapon | NPC | HostileNPC | Player 
-;
+	Room | Item | Weapon | NPC | HostileNPC | Player;
 
 Room:
-	'room' name=ID entityName=EntityName roomAttributes+=RoomAttribute* 
-;
+	'room' name=ID entityName=EntityName roomAttributes+=RoomAttribute*;
 
 RoomAttribute:
-	PathList | ItemList | NPCList | WeaponList | HostileNPCList | PlayerList
-;
+	PathList | ItemList | NPCList | WeaponList | HostileNPCList | PlayerList;
 
 PathList:
-	'paths' '=' pathList+=Path (','? pathList+=Path)*
-;
+	'paths' '=' pathList+=Path (','? pathList+=Path)*;
 
 ItemList:
-	'items' '=' itemList+=[Item] (','? itemList+=[Item])* 
-;
+	'items' '=' itemList+=[Item] (','? itemList+=[Item])*;
 
 WeaponList:
-	'weapons' '=' weaponsList+=[Weapon] (','? weaponsList+=[Weapon])*
-;
+	'weapons' '=' weaponsList+=[Weapon] (','? weaponsList+=[Weapon])*;
 
 NPCList:
-	'npcs' '=' npcList+=[NPC] (','? npcList+=[NPC])*
-;
+	'npcs' '=' npcList+=[NPC] (','? npcList+=[NPC])*;
 
 HostileNPCList:
-	'hostileNpcs' '=' hostileNPCList+=[HostileNPC] (','? hostileNPCList+=[HostileNPC])*
-;
+	'hostileNpcs' '=' hostileNPCList+=[HostileNPC] (','? hostileNPCList+=[HostileNPC])*;
 
 PlayerList:
-	'players' '=' playerList+=[Player] (','? playerList+=[Player])*
-;
+	'players' '=' playerList+=[Player] (','? playerList+=[Player])*;
 
 Path:
 	toType=[Room]
-	'through' entityName=EntityName 
-	'requires'? requireItem=[Item]?
-;
+	'through' entityName=EntityName
+	'requires'? requireItem=[Item]?;
 
 Item:
-	'item' name=ID entityName=EntityName (':' itemType=[Item])? 
-	attributes+=Attribute*
-;
+	'item' name=ID entityName=EntityName (':' itemType=[Item])?
+	attributes+=Attribute*;
 
 Weapon:
-	'weapon' name=ID entityName=EntityName (':' weaponType=[Weapon])? 
-	attributes+=Attribute*
-;
+	'weapon' name=ID entityName=EntityName (':' weaponType=[Weapon])?
+	attributes+=Attribute*;
 
 Player:
 	'player' name=ID entityName=EntityName (':' playerType=[Player])?
-	attributes+=Attribute*
-;
+	attributes+=Attribute*;
 
 NPC:
 	'npc' name=ID entityName=EntityName (':' npcType=[NPC])?
-	attributes+=Attribute*
-;
+	attributes+=Attribute*;
 
 HostileNPC:
 	'hostilenpc' name=ID entityName=EntityName (':' hostileNpcType=[HostileNPC])?
-	attributes+=Attribute*
-;
+	attributes+=Attribute*;
 
 Var:
-	type=[Type] '.' attribute=ID //[Attribute] istedet for ID
+	type=[Type] '.' attribute=ID // [Attribute] istedet for ID
 ;
 
 Attribute:
-	Health | Weight | Damage | Durability | CarryCapacity | Escapeable | Aggressive
-;
+	Health | Weight | Damage | Durability | CarryCapacity | Escapeable | Aggressive;
 
 Health:
-	'health' '=' health=Constant
-;
+	'health' '=' health=Constant;
 
 //Obtainable:
 //	'obtainable' '='? (obtainable?='true' | obtainable?='false')
 //;
-
-
 Weight:
-	'weight' '=' weight=INT 
-;
+	'weight' '=' weight=INT;
 
 Damage:
-	'damage' '=' damage=INT
-;
+	'damage' '=' damage=INT;
 
 Durability:
-	'durability' '=' durability=INT
-;
+	'durability' '=' durability=INT;
 
 CarryCapacity:
-	'carryCapacity' '=' carryCapacity=INT
-;
+	'carryCapacity' '=' carryCapacity=INT;
 
 Escapeable:
-	'escapeable' '=' (escapeable?='true' | escapeable?='false') 
-;
+	'escapeable' '=' (escapeable?='true' | escapeable?='false');
 
 Aggressive:
-	'aggressive' '=' (aggressive?='true' | aggressive?='false') 
+	'aggressive' '=' (aggressive?='true' | aggressive?='false');
+
+GameRule returns Element:
+	{Element} 'GameRules:' rules+=Rule*;
+
+Rule:
+	'Time' '=' INT
+	('if' Condition=Logic 'then' action=Action)*
+/*
+ * 
+ * Player '.' Var=health <= 0) then GameOver' |
+ * 'if(Time <= 0) then GameOver' |
+ * 'if(WinCondition == true) then GameOver' |
+ * 'if(Item.durability <= 0) then remove Item' |
+ 'WinCondition = reach northern_tower_level_2 && carry key */
 ;
+
+Action:
+	GameWorld='GameOver';
 
 //Logic Expressions
-
 Logic returns LogicExp:
-	Conjunction ('||' {Or.left=current} right=Conjunction)*
-;
+	Conjunction ('||' {Or.left=current} right=Conjunction)*;
 
 Conjunction returns LogicExp:
-	PrimLogic ('&&' {And.left=current} right=PrimLogic)*
-;
+	PrimLogic ('&&' {And.left=current} right=PrimLogic)*;
 
 PrimLogic returns LogicExp:
-	Comparison | '[' logic=Logic ']'
-;
-
+	Comparison | '[' logic=Logic ']';
 
 Comparison:
-	left=Exp op=CompareOp right=Exp
-;
+	left=Exp op=CompareOp right=Exp;
 
 CompareOp:
-	'<' | '>' | '==' | '<=' | '>='
-;
+	'<' | '>' | '==' | '<=' | '>=';
 
 Exp returns Expression:
-	Factor (('+' {Plus.left=current}| '-' {Minus.left=current}) right=Factor)*
-;
+	Factor (('+' {Plus.left=current} | '-' {Minus.left=current}) right=Factor)*;
 
 Factor returns Expression:
-	PrimExp (('*' {Mult.left=current} | '/' {Div.left=current}) right=PrimExp)*
-;
+	PrimExp (('*' {Mult.left=current} | '/' {Div.left=current}) right=PrimExp)*;
 
 PrimExp returns Expression:
-	Var | Constant | '(' exp=Exp ')'
-;
+	Var | Constant | '(' exp=Exp ')';
 
 Constant:
-	value=INT
-;
-
+	value=INT;
