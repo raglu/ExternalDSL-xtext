@@ -73,7 +73,10 @@ class MyDslGenerator extends AbstractGenerator {
 			fsa.generateFile("gameDSL/" + e.name.toFirstUpper + ".java", e.roomCompile)
 		}
 		for (e : resource.allContents.toIterable.filter(GameWorld)) {
-			fsa.generateFile("gameDSL/EntityGenerator.java", e.gameWorldCompile)
+			fsa.generateFile("gameDSL/EntityGenerator.java", e.gentityGeneratorCompile)
+		}
+		for (e : resource.allContents.toIterable.filter(GameWorld)) {
+			fsa.generateFile("gameDSL/Main.java", e.mainCompile)
 		}
 
 	/*val GameGenerator = resource.allContents.filter(GameWorld).next
@@ -81,7 +84,7 @@ class MyDslGenerator extends AbstractGenerator {
 	 System::out.println(GameGenerator.generate)*/
 	}
 
-	def CharSequence gameWorldCompile(GameWorld gameWorld) {
+	def CharSequence gentityGeneratorCompile(GameWorld gameWorld) {
 		'''
 			package gameDSL;
 			
@@ -120,7 +123,7 @@ class MyDslGenerator extends AbstractGenerator {
 				«ENDIF»
 			 «ENDFOR»
 			 
-			       return players;
+			     return players;
 			     }
 			 
 			 public static ArrayList<NPC> generateNPCs() {
@@ -142,11 +145,10 @@ class MyDslGenerator extends AbstractGenerator {
 				«ENDIF»
 			 «ENDFOR»
 			 
-			       return npcs;
+			     return npcs;
 			     }
 			}
 		'''
-
 	}
 
 	def CharSequence roomCompile(Room room) {
@@ -280,7 +282,7 @@ class MyDslGenerator extends AbstractGenerator {
 				
 				public «player.name.toFirstUpper»(Room currentRoom) {
 					super(currentRoom, "«player.entityName.value»", «FOR a : player.attributes.filter(Attribute).filter(Health)»
-																																								«a.health.value»
+																																										«a.health.value»
 					«ENDFOR»,
 					«FOR a : player.attributes.filter(Attribute).filter(CarryCapacity)»
 						«a.carryCapacity»
@@ -288,6 +290,19 @@ class MyDslGenerator extends AbstractGenerator {
 				}
 			}
 		'''
+	}
+
+	def CharSequence mainCompile(GameWorld gameWorld) {
+			'''
+			package gameDSL;
+			
+			public class Main {
+			    public static void main(String[] argv) {
+			        Game g = new Game("«gameWorld.name»");
+			        g.play();
+			    }
+			}
+			'''
 	}
 
 	// def generateJavaFile()

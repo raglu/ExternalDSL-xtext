@@ -9,7 +9,6 @@ class BoilerPlateShit {
 		generateGame(fsa);
 		generateHostileNPC(fsa);
 		generateItem(fsa);
-		generateMain(fsa);
 		generateNPC(fsa);
 		generateParser(fsa);
 		generatePath(fsa);
@@ -57,16 +56,18 @@ class BoilerPlateShit {
 			
 			public class Game {
 			
-			    private final String gameWorld = "Luigi's tower";
-			    private boolean playing = true;
+			    private String gameWorld;
+			    private boolean playing;
 			
 			    private final GameRules gameRules;
 			    ArrayList<Room> rooms;
 			    ArrayList<Player> players;
 			    ArrayList<NPC> npcs;
 			
-			    public Game() {
+			    public Game(String gameWorldName) {
 			        gameRules = new GameRules(this);
+			
+			        gameWorld = gameWorldName;
 			
 			        rooms = EntityGenerator.generateRooms();
 			        players = EntityGenerator.generatePlayers();
@@ -75,6 +76,8 @@ class BoilerPlateShit {
 			    }
 			
 			    public void play() {
+			
+			        playing = true;
 			
 			        System.out.println("Welcome to " + gameWorld);
 			
@@ -326,7 +329,6 @@ class BoilerPlateShit {
 			        System.out.println("You won the game!");
 			    }
 			}
-			
 			'''
 		)
 	}
@@ -429,22 +431,6 @@ class BoilerPlateShit {
 			
 			    public int getWeight() {
 			        return weight;
-			    }
-			}
-			'''
-		)
-	}
-
-	def static generateMain(IFileSystemAccess2 fsa) {
-		fsa.generateFile(
-			"gameDSL/Main.java",
-			'''
-			package gameDSL;
-			
-			public class Main {
-			    public static void main(String[] argv) {
-			        Game g = new Game();
-			        g.play();
 			    }
 			}
 			'''

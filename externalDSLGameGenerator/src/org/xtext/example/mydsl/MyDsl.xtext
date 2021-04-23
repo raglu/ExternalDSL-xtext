@@ -3,7 +3,7 @@ grammar org.xtext.example.mydsl.MyDsl with org.eclipse.xtext.common.Terminals
 generate myDsl "http://www.xtext.org/example/mydsl/MyDsl"
 
 GameWorld:
-	'GameWorld' name=ID ':' elements+=Element*;
+	'GameWorld' name=STRING ':' elements+=Element*;
 
 Element:
 	GameRule | GameEntity;
