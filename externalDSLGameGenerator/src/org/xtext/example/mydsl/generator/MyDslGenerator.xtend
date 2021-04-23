@@ -52,7 +52,7 @@ class MyDslGenerator extends AbstractGenerator {
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
 
-		BoilerPlateShit.generateBoilerPlateCode(fsa);
+		BoilerPlate.generateBoilerPlateCode(fsa);
 
 		for (e : resource.allContents.toIterable.filter(Player)) {
 			fsa.generateFile("gameDSL/" + e.name.toFirstUpper + ".java", e.playerCompile)
