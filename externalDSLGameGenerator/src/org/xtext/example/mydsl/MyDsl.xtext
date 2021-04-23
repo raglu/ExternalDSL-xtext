@@ -8,7 +8,7 @@ GameWorld:
 Element:
 	GameRule | GameEntity;
 
-GameEntity returns Element:
+GameEntity:
 	'create' type=Type;
 
 EntityName:
@@ -97,8 +97,8 @@ Escapeable:
 Aggressive:
 	'aggressive' '=' (aggressive?='true' | aggressive?='false');
 
-GameRule returns Element:
-	{Element} 'GameRules:' rules+=Rule*;
+GameRule:
+	'GameRules:' rules+=Rule*;
 
 Rule:
 	'Time' '=' INT

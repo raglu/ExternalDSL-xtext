@@ -41,6 +41,7 @@ import org.xtext.example.mydsl.myDsl.Var
 import org.xtext.example.mydsl.myDsl.Weapon
 import org.xtext.example.mydsl.myDsl.WeaponList
 import org.xtext.example.mydsl.myDsl.Weight
+import org.xtext.example.mydsl.myDsl.GameEntity
 
 /**
  * Generates code from your model files on save.
