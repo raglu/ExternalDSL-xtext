@@ -2,7 +2,7 @@ package org.xtext.example.mydsl.generator
 
 import org.eclipse.xtext.generator.IFileSystemAccess2
 
-class BoilerPlateShit {
+class BoilerPlate {
 
 	def static generateBoilerPlateCode(IFileSystemAccess2 fsa) {
 		generateCommand(fsa);
