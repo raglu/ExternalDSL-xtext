@@ -98,11 +98,11 @@ Aggressive:
 	'aggressive' '=' (aggressive?='true' | aggressive?='false');
 
 GameRule:
-	'GameRules:' rules+=Rule*;
+	{GameRule} 'GameRules:' rules+=Rule*;
 
 Rule:
-	'Time' '=' INT
-	('if' Condition=Logic 'then' action=Action)*
+	{Rule} 'Time' '=' INT
+	('if' Condition+=Logic 'then' action+=Action)*
 /*
  * 
  * Player '.' Var=health <= 0) then GameOver' |
