@@ -6,7 +6,7 @@ GameWorld:
 	'GameWorld' name=STRING ':' elements+=Element*;
 
 Element:
-	GameRule | GameEntity;
+	GameRules | GameEntity;
 
 GameEntity:
 	'create' type=Type;
@@ -48,37 +48,30 @@ Path:
 
 Item:
 	'item' name=ID entityName=EntityName (':' itemType=[Item])?
-	attributes+=Attribute*;
+	attributes+=EntityAttribute*;
 
 Weapon:
 	'weapon' name=ID entityName=EntityName (':' weaponType=[Weapon])?
-	attributes+=Attribute*;
+	attributes+=EntityAttribute*;
 
 Player:
 	'player' name=ID entityName=EntityName (':' playerType=[Player])?
-	attributes+=Attribute*;
+	attributes+=EntityAttribute*;
 
 NPC:
 	'npc' name=ID entityName=EntityName (':' npcType=[NPC])?
-	attributes+=Attribute*;
+	attributes+=EntityAttribute*;
 
 HostileNPC:
 	'hostilenpc' name=ID entityName=EntityName (':' hostileNpcType=[HostileNPC])?
-	attributes+=Attribute*;
+	attributes+=EntityAttribute*;
 
-Var:
-	type=[Type] '.' attribute=ID // [Attribute] istedet for ID
-;
-
-Attribute:
+EntityAttribute:
 	Health | Weight | Damage | Durability | CarryCapacity | Escapeable | Aggressive;
 
 Health:
 	'health' '=' health=Constant;
 
-//Obtainable:
-//	'obtainable' '='? (obtainable?='true' | obtainable?='false')
-//;
 Weight:
 	'weight' '=' weight=INT;
 
@@ -97,12 +90,11 @@ Escapeable:
 Aggressive:
 	'aggressive' '=' (aggressive?='true' | aggressive?='false');
 
-GameRule:
+GameRules:
 	{GameRule} 'GameRules:' rules+=Rule*;
 
 Rule:
-	{Rule} 'Time' '=' INT
-	('if' Condition+=Logic 'then' action+=Action)*
+	ConditionalRule | TimeRule
 /*
  * 
  * Player '.' Var=health <= 0) then GameOver' |
@@ -112,8 +104,14 @@ Rule:
  'WinCondition = reach northern_tower_level_2 && carry key */
 ;
 
+ConditionalRule:
+	'if' Condition+=Logic 'then' action+=Action;
+
+TimeRule:
+	'time' '=' time=INT;
+
 Action:
-	GameWorld='GameOver';
+	value=STRING;
 
 //Logic Expressions
 Logic returns LogicExp:
@@ -139,6 +137,10 @@ Factor returns Expression:
 
 PrimExp returns Expression:
 	Var | Constant | '(' exp=Exp ')';
+	
+Var:
+	type=[Type] '.' attribute=ID // [Attribute] istedet for ID
+;
 
 Constant:
 	value=INT;

@@ -42,6 +42,7 @@ import org.xtext.example.mydsl.myDsl.Weapon
 import org.xtext.example.mydsl.myDsl.WeaponList
 import org.xtext.example.mydsl.myDsl.Weight
 import org.xtext.example.mydsl.myDsl.GameEntity
+import org.xtext.example.mydsl.myDsl.GameRules
 
 /**
  * Generates code from your model files on save.
@@ -53,7 +54,7 @@ class MyDslGenerator extends AbstractGenerator {
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
 
 		BoilerPlateGenerator.generateCode(fsa);
-		
+
 		for (e : resource.allContents.toIterable.filter(Player)) {
 			fsa.generateFile("gameDSL/" + e.name.toFirstUpper + ".java", e.playerCompile)
 		}
@@ -78,10 +79,82 @@ class MyDslGenerator extends AbstractGenerator {
 		for (e : resource.allContents.toIterable.filter(GameWorld)) {
 			fsa.generateFile("gameDSL/Main.java", e.mainCompile)
 		}
+		for (e : resource.allContents.toIterable.filter(GameWorld)) {
+			fsa.generateFile("gameDSL/GameRules.java", e.gameRulesCompile)
+		}
 
 	/*val GameGenerator = resource.allContents.filter(GameWorld).next
 
 	 System::out.println(GameGenerator.generate)*/
+	}
+	
+	def CharSequence gameRulesCompile(GameWorld gameWorld) {
+		
+		'''
+		«FOR a : gameWorld.elements.filter(Element).filter(GameRules)»
+			package gameDSL;
+			
+			public class GameRules {
+			
+				private final float startTime;
+			
+				private final Game game;
+			
+				boolean winCondition = false;
+			
+				public GameRules(Game game) {
+					this.game = game;
+					startTime = System.currentTimeMillis() / 1000L;
+				}
+			
+				public void checkRules() {
+					checkWinCondition1();
+					checkRule1();
+					checkRule2();
+					checkRule3();
+					checkRule4();
+				}
+			
+				private void checkWinCondition1() {
+					for (Player player : game.players) {
+						if (player.getCurrentRoom() instanceof Northern_tower_level_2 && player.hasItem("key")) {
+							winCondition = true;
+							game.winGame();
+						}
+					}
+				}
+			
+				private void checkRule1() {
+					for (Player player : game.players) {
+						if (player.getHealth() <= 0)
+							game.gameOver();
+					}
+				}
+			
+				private void checkRule2() {
+					if (time <= System.currentTimeMillis() / 1000L - startTime)
+						game.gameOver();
+				}
+			
+				private void checkRule3() {
+					if (winCondition)
+						game.gameOver();
+				}
+			
+				private void checkRule4() {
+					for (Player player : game.players) {
+						Weapon weapon = (Weapon) player.getEquipped();
+						if (weapon != null)
+							if (weapon.getDurability() <= 0) {
+								player.removeItem(weapon);
+								player.setEquipped(null);
+							}
+					}
+				}
+			
+			}
+		«ENDFOR»
+		'''
 	}
 
 	def CharSequence gentityGeneratorCompile(GameWorld gameWorld) {
@@ -123,8 +196,8 @@ class MyDslGenerator extends AbstractGenerator {
 				«ENDIF»
 			 «ENDFOR»
 			 
-			     return players;
-			     }
+			    return players;
+			    }
 			 
 			 public static ArrayList<NPC> generateNPCs() {
 			         ArrayList<NPC> npcs = new ArrayList<>();
@@ -145,8 +218,8 @@ class MyDslGenerator extends AbstractGenerator {
 				«ENDIF»
 			 «ENDFOR»
 			 
-			     return npcs;
-			     }
+			    return npcs;
+			    }
 			}
 		'''
 	}
@@ -282,7 +355,7 @@ class MyDslGenerator extends AbstractGenerator {
 				
 				public «player.name.toFirstUpper»(Room currentRoom) {
 					super(currentRoom, "«player.entityName.value»", «FOR a : player.attributes.filter(Attribute).filter(Health)»
-																																										«a.health.value»
+																																											«a.health.value»
 					«ENDFOR»,
 					«FOR a : player.attributes.filter(Attribute).filter(CarryCapacity)»
 						«a.carryCapacity»
@@ -293,7 +366,7 @@ class MyDslGenerator extends AbstractGenerator {
 	}
 
 	def CharSequence mainCompile(GameWorld gameWorld) {
-			'''
+		'''
 			package gameDSL;
 			
 			public class Main {
@@ -302,7 +375,7 @@ class MyDslGenerator extends AbstractGenerator {
 			        g.play();
 			    }
 			}
-			'''
+		'''
 	}
 
 	// def generateJavaFile()

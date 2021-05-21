@@ -159,7 +159,7 @@ class BoilerPlateGenerator {
 			                return;
 			            }
 			        }
-			
+					
 			        player.setInCombat(false);
 			        player.setTargetHostileNPC(null);
 			
