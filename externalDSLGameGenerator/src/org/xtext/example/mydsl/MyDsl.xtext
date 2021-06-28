@@ -9,22 +9,26 @@ Element:
 	GameRules | GameEntity;
 
 GameEntity:
-	'create' type=Type;
+	'create' type=EntityType;
 
 EntityName:
 	value=STRING;
 
-Type:
+EntityType:
 	Room | Item | Weapon | NPC | HostileNPC | Player;
 
 Room:
 	'room' name=ID entityName=EntityName roomAttributes+=RoomAttribute*;
 
 RoomAttribute:
-	PathList | ItemList | NPCList | WeaponList | HostileNPCList | PlayerList;
+	PathList | EntityList;
+//	PathList | ItemList | NPCList | WeaponList | HostileNPCList | PlayerList;
 
 PathList:
 	'paths' '=' pathList+=Path (','? pathList+=Path)*;
+	
+EntityList:
+	'entities' '=' entityList+=[EntityType] (','? entityList+=[EntityType])*;
 
 ItemList:
 	'items' '=' itemList+=[Item] (','? itemList+=[Item])*;
@@ -139,7 +143,7 @@ PrimExp returns Expression:
 	Var | Constant | '(' exp=Exp ')';
 	
 Var:
-	type=[Type] '.' attribute=ID // [Attribute] istedet for ID
+	entityType=[EntityType] '.' attribute=ID // [Attribute] istedet for ID
 ;
 
 Constant:

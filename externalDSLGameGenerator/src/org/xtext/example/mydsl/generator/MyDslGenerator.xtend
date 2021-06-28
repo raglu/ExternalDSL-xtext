@@ -10,7 +10,6 @@ import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
 import org.xtext.example.mydsl.myDsl.Aggressive
 import org.xtext.example.mydsl.myDsl.And
-import org.xtext.example.mydsl.myDsl.Attribute
 import org.xtext.example.mydsl.myDsl.CarryCapacity
 import org.xtext.example.mydsl.myDsl.Comparison
 import org.xtext.example.mydsl.myDsl.Constant
@@ -43,6 +42,7 @@ import org.xtext.example.mydsl.myDsl.WeaponList
 import org.xtext.example.mydsl.myDsl.Weight
 import org.xtext.example.mydsl.myDsl.GameEntity
 import org.xtext.example.mydsl.myDsl.GameRules
+import org.xtext.example.mydsl.myDsl.EntityAttribute
 
 /**
  * Generates code from your model files on save.
@@ -274,7 +274,7 @@ class MyDslGenerator extends AbstractGenerator {
 				
 				public «item.name.toFirstUpper»() {
 					super("«item.entityName.value»"
-					«FOR a : item.attributes.filter(Attribute).filter(Weight)»
+					«FOR a : item.attributes.filter(EntityAttribute).filter(Weight)»
 						«IF a!==null»
 							, «a.weight»
 						«ENDIF»
@@ -293,13 +293,13 @@ class MyDslGenerator extends AbstractGenerator {
 				
 				public «weapon.name.toFirstUpper»() {
 					super("«weapon.entityName.value»", 
-					«FOR a : weapon.attributes.filter(Attribute).filter(Weight)»
+					«FOR a : weapon.attributes.filter(EntityAttribute).filter(Weight)»
 						«a.weight»
 					«ENDFOR»,
-					«FOR a : weapon.attributes.filter(Attribute).filter(Damage)»
+					«FOR a : weapon.attributes.filter(EntityAttribute).filter(Damage)»
 						«a.damage»
 					«ENDFOR»,
-					«FOR a : weapon.attributes.filter(Attribute).filter(Durability)»
+					«FOR a : weapon.attributes.filter(EntityAttribute).filter(Durability)»
 						«a.durability»
 					«ENDFOR»
 					);
@@ -328,16 +328,16 @@ class MyDslGenerator extends AbstractGenerator {
 				
 				public «hostileNpc.name.toFirstUpper»(Room currentRoom) {
 					super(currentRoom, "«hostileNpc.entityName.value»", 
-					«FOR a : hostileNpc.attributes.filter(Attribute).filter(Escapeable)»
+					«FOR a : hostileNpc.attributes.filter(EntityAttribute).filter(Escapeable)»
 						«a.escapeable»
 					«ENDFOR»,
-					«FOR a : hostileNpc.attributes.filter(Attribute).filter(Health)»
+					«FOR a : hostileNpc.attributes.filter(EntityAttribute).filter(Health)»
 						«a.health.value»
 					«ENDFOR»,
-					«FOR a : hostileNpc.attributes.filter(Attribute).filter(Damage)»
+					«FOR a : hostileNpc.attributes.filter(EntityAttribute).filter(Damage)»
 						«a.damage»
 					«ENDFOR»
-					«FOR a : hostileNpc.attributes.filter(Attribute).filter(Aggressive)»
+					«FOR a : hostileNpc.attributes.filter(EntityAttribute).filter(Aggressive)»
 						«IF a.aggressive»
 							, true
 						«ENDIF»
@@ -354,10 +354,10 @@ class MyDslGenerator extends AbstractGenerator {
 			public class «player.name.toFirstUpper» extends Player {
 				
 				public «player.name.toFirstUpper»(Room currentRoom) {
-					super(currentRoom, "«player.entityName.value»", «FOR a : player.attributes.filter(Attribute).filter(Health)»
+					super(currentRoom, "«player.entityName.value»", «FOR a : player.attributes.filter(EntityAttribute).filter(Health)»
 																																											«a.health.value»
 					«ENDFOR»,
-					«FOR a : player.attributes.filter(Attribute).filter(CarryCapacity)»
+					«FOR a : player.attributes.filter(EntityAttribute).filter(CarryCapacity)»
 						«a.carryCapacity»
 					«ENDFOR»);
 				}
