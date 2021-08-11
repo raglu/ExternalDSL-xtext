@@ -9,12 +9,6 @@ Element:
 	GameRules | GameEntity;
 
 GameEntity:
-	'create' type=Type;
-
-EntityName:
-	value=STRING;
-
-Type:
 	Room | Item | Weapon | NPC | HostileNPC | Player;
 
 Room:
@@ -136,11 +130,12 @@ Factor returns Expression:
 	PrimExp (('*' {Mult.left=current} | '/' {Div.left=current}) right=PrimExp)*;
 
 PrimExp returns Expression:
-	Var | Constant | '(' exp=Exp ')';
+//	Var | Constant | '(' exp=Exp ')';
+	Constant | '(' exp=Exp ')';
 	
-Var:
-	type=[Type] '.' attribute=ID // [Attribute] istedet for ID
-;
+//Var:
+//	type=[Type] '.' attribute=ID // [Attribute] istedet for ID
+//;
 
 Constant:
 	value=INT;
