@@ -3,7 +3,7 @@ grammar org.xtext.example.mydsl.MyDsl with org.eclipse.xtext.common.Terminals
 generate myDsl "http://www.xtext.org/example/mydsl/MyDsl"
 
 GameWorld:
-	'GameWorld' name=STRING ':' elements+=Element*;
+	'GameWorld' name=STRING elements+=Element*;
 
 Element:
 	GameRules | GameEntity;
@@ -18,7 +18,7 @@ Type:
 	Room | Item | Weapon | NPC | HostileNPC | Player;
 
 Room:
-	'room' name=ID entityName=EntityName roomAttributes+=RoomAttribute*;
+	'room' name=ID entityName=STRING roomAttributes+=RoomAttribute*;
 
 RoomAttribute:
 	PathList | ItemList | NPCList | WeaponList | HostileNPCList | PlayerList;
@@ -43,27 +43,27 @@ PlayerList:
 
 Path:
 	toType=[Room]
-	'through' entityName=EntityName
+	'through' entityName=STRING
 	'requires'? requireItem=[Item]?;
 
 Item:
-	'item' name=ID entityName=EntityName (':' itemType=[Item])?
+	'item' name=ID entityName=STRING (':' itemType=[Item])?
 	attributes+=EntityAttribute*;
 
 Weapon:
-	'weapon' name=ID entityName=EntityName (':' weaponType=[Weapon])?
+	'weapon' name=ID entityName=STRING (':' weaponType=[Weapon])?
 	attributes+=EntityAttribute*;
 
 Player:
-	'player' name=ID entityName=EntityName (':' playerType=[Player])?
+	'player' name=ID entityName=STRING (':' playerType=[Player])?
 	attributes+=EntityAttribute*;
 
 NPC:
-	'npc' name=ID entityName=EntityName (':' npcType=[NPC])?
+	'npc' name=ID entityName=STRING (':' npcType=[NPC])?
 	attributes+=EntityAttribute*;
 
 HostileNPC:
-	'hostilenpc' name=ID entityName=EntityName (':' hostileNpcType=[HostileNPC])?
+	'hostilenpc' name=ID entityName=STRING (':' hostileNpcType=[HostileNPC])?
 	attributes+=EntityAttribute*;
 
 EntityAttribute:

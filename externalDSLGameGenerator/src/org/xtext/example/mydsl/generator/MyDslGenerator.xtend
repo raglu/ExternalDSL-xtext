@@ -3,14 +3,13 @@
  */
 package org.xtext.example.mydsl.generator
 
-import org.eclipse.emf.common.util.EList
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
 import org.xtext.example.mydsl.myDsl.Aggressive
 import org.xtext.example.mydsl.myDsl.And
-import org.xtext.example.mydsl.myDsl.Attribute
+import org.xtext.example.mydsl.myDsl.EntityAttribute
 import org.xtext.example.mydsl.myDsl.CarryCapacity
 import org.xtext.example.mydsl.myDsl.Comparison
 import org.xtext.example.mydsl.myDsl.Constant
@@ -42,7 +41,6 @@ import org.xtext.example.mydsl.myDsl.Weapon
 import org.xtext.example.mydsl.myDsl.WeaponList
 import org.xtext.example.mydsl.myDsl.Weight
 import org.xtext.example.mydsl.myDsl.GameEntity
-import org.xtext.example.mydsl.myDsl.GameRules
 
 /**
  * Generates code from your model files on save.
@@ -54,7 +52,7 @@ class MyDslGenerator extends AbstractGenerator {
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
 
 		BoilerPlateGenerator.generateCode(fsa);
-
+		
 		for (e : resource.allContents.toIterable.filter(Player)) {
 			fsa.generateFile("gameDSL/" + e.name.toFirstUpper + ".java", e.playerCompile)
 		}
@@ -79,82 +77,10 @@ class MyDslGenerator extends AbstractGenerator {
 		for (e : resource.allContents.toIterable.filter(GameWorld)) {
 			fsa.generateFile("gameDSL/Main.java", e.mainCompile)
 		}
-		for (e : resource.allContents.toIterable.filter(GameWorld)) {
-			fsa.generateFile("gameDSL/GameRules.java", e.gameRulesCompile)
-		}
 
 	/*val GameGenerator = resource.allContents.filter(GameWorld).next
 
 	 System::out.println(GameGenerator.generate)*/
-	}
-	
-	def CharSequence gameRulesCompile(GameWorld gameWorld) {
-		
-		'''
-		«FOR a : gameWorld.elements.filter(Element).filter(GameRules)»
-			package gameDSL;
-			
-			public class GameRules {
-			
-				private final float startTime;
-			
-				private final Game game;
-			
-				boolean winCondition = false;
-			
-				public GameRules(Game game) {
-					this.game = game;
-					startTime = System.currentTimeMillis() / 1000L;
-				}
-			
-				public void checkRules() {
-					checkWinCondition1();
-					checkRule1();
-					checkRule2();
-					checkRule3();
-					checkRule4();
-				}
-			
-				private void checkWinCondition1() {
-					for (Player player : game.players) {
-						if (player.getCurrentRoom() instanceof Northern_tower_level_2 && player.hasItem("key")) {
-							winCondition = true;
-							game.winGame();
-						}
-					}
-				}
-			
-				private void checkRule1() {
-					for (Player player : game.players) {
-						if (player.getHealth() <= 0)
-							game.gameOver();
-					}
-				}
-			
-				private void checkRule2() {
-					if (time <= System.currentTimeMillis() / 1000L - startTime)
-						game.gameOver();
-				}
-			
-				private void checkRule3() {
-					if (winCondition)
-						game.gameOver();
-				}
-			
-				private void checkRule4() {
-					for (Player player : game.players) {
-						Weapon weapon = (Weapon) player.getEquipped();
-						if (weapon != null)
-							if (weapon.getDurability() <= 0) {
-								player.removeItem(weapon);
-								player.setEquipped(null);
-							}
-					}
-				}
-			
-			}
-		«ENDFOR»
-		'''
 	}
 
 	def CharSequence gentityGeneratorCompile(GameWorld gameWorld) {
@@ -168,11 +94,11 @@ class MyDslGenerator extends AbstractGenerator {
 				public static ArrayList<Room> generateRooms() {
 					ArrayList<Room> rooms = new ArrayList<>();
 					
-			«FOR a : gameWorld.elements.filter(Element).filter(GameEntity)»
-				«IF a.type instanceof Room»
-					rooms.add(«a.type.name.toFirstUpper».getInstance());
-				«ENDIF»
-			«ENDFOR»
+			Â«FOR a : gameWorld.elements.filter(Element).filter(GameEntity)Â»
+				Â«IF a.type instanceof RoomÂ»
+					rooms.add(Â«a.type.name.toFirstUpperÂ».getInstance());
+				Â«ENDIFÂ»
+			Â«ENDFORÂ»
 			
 			     	for (Room room : rooms) {
 			     	  	room.setPaths();
@@ -185,83 +111,83 @@ class MyDslGenerator extends AbstractGenerator {
 			    public static ArrayList<Player> generatePlayers() {
 			         ArrayList<Player> players = new ArrayList<>();
 			         
-			«FOR a : gameWorld.elements.filter(Element).filter(GameEntity)»
-				«IF a.type instanceof Room»
-					«var room = a.type as Room»
-						«FOR b : room.roomAttributes.filter(PlayerList)»
-							«FOR c : b.playerList»
-								players.add(new «c.name.toFirstUpper»(«room.name.toFirstUpper».getInstance()));
-							«ENDFOR»
-						«ENDFOR»
-				«ENDIF»
-			 «ENDFOR»
+			Â«FOR a : gameWorld.elements.filter(Element).filter(GameEntity)Â»
+				Â«IF a.type instanceof RoomÂ»
+					Â«var room = a.type as RoomÂ»
+						Â«FOR b : room.roomAttributes.filter(PlayerList)Â»
+							Â«FOR c : b.playerListÂ»
+								players.add(new Â«c.name.toFirstUpperÂ»(Â«room.name.toFirstUpperÂ».getInstance()));
+							Â«ENDFORÂ»
+						Â«ENDFORÂ»
+				Â«ENDIFÂ»
+			 Â«ENDFORÂ»
 			 
-			    return players;
-			    }
+			     return players;
+			     }
 			 
 			 public static ArrayList<NPC> generateNPCs() {
 			         ArrayList<NPC> npcs = new ArrayList<>();
 			         
-			«FOR a : gameWorld.elements.filter(Element).filter(GameEntity)»
-				«IF a.type instanceof Room»
-					«var room = a.type as Room»
-						«FOR b : room.roomAttributes.filter(NPCList)»
-							«FOR c : b.npcList»
-								npcs.add(new «c.name.toFirstUpper»(«room.name.toFirstUpper».getInstance()));
-							«ENDFOR»
-						«ENDFOR»
-						«FOR b : room.roomAttributes.filter(HostileNPCList)»
-							«FOR c : b.hostileNPCList»
-								npcs.add(new «c.name.toFirstUpper»(«room.name.toFirstUpper».getInstance()));
-							«ENDFOR»
-						«ENDFOR»
-				«ENDIF»
-			 «ENDFOR»
+			Â«FOR a : gameWorld.elements.filter(Element).filter(GameEntity)Â»
+				Â«IF a.type instanceof RoomÂ»
+					Â«var room = a.type as RoomÂ»
+						Â«FOR b : room.roomAttributes.filter(NPCList)Â»
+							Â«FOR c : b.npcListÂ»
+								npcs.add(new Â«c.name.toFirstUpperÂ»(Â«room.name.toFirstUpperÂ».getInstance()));
+							Â«ENDFORÂ»
+						Â«ENDFORÂ»
+						Â«FOR b : room.roomAttributes.filter(HostileNPCList)Â»
+							Â«FOR c : b.hostileNPCListÂ»
+								npcs.add(new Â«c.name.toFirstUpperÂ»(Â«room.name.toFirstUpperÂ».getInstance()));
+							Â«ENDFORÂ»
+						Â«ENDFORÂ»
+				Â«ENDIFÂ»
+			 Â«ENDFORÂ»
 			 
-			    return npcs;
-			    }
-			}
+			     return npcs;
+			     }
+			}Â«Â»
 		'''
 	}
 
 	def CharSequence roomCompile(Room room) {
 		'''
 			package gameDSL;
-			public class «room.name.toFirstUpper» extends Room {
+			public class Â«room.name.toFirstUpperÂ» extends Room {
 				
-				static private «room.name.toFirstUpper» instance = new «room.name.toFirstUpper»();
+				static private Â«room.name.toFirstUpperÂ» instance = new Â«room.name.toFirstUpperÂ»();
 				
-				public static «room.name.toFirstUpper» getInstance() {
+				public static Â«room.name.toFirstUpperÂ» getInstance() {
 					return instance;
 				}
 				
-				private «room.name.toFirstUpper»() {
-					super("«room.entityName.value»");
+				private Â«room.name.toFirstUpperÂ»() {
+					super("Â«room.entityNameÂ»");
 				}
 				
 				public void setPaths() {
-					«FOR a : room.roomAttributes.filter(RoomAttribute).filter(PathList)»
-						«FOR b: a.pathList.filter(Path)»
-							paths.add(new Path(«b.toType.name.toFirstUpper».getInstance(),					
-							"«b.entityName.value»"
-							«IF b.requireItem!==null»
-								, new «b.requireItem.name.toFirstUpper»()
-							«ENDIF»));
+					Â«FOR a : room.roomAttributes.filter(RoomAttribute).filter(PathList)Â»
+						Â«FOR b: a.pathList.filter(Path)Â»
+							paths.add(new Path(Â«b.toType.name.toFirstUpperÂ».getInstance(),					
+							"Â«b.entityNameÂ»"
+							Â«IF b.requireItem!==nullÂ»
+								, new Â«b.requireItem.name.toFirstUpperÂ»()
+							Â«ENDIFÂ»));
 							
-						«ENDFOR»	
-					«ENDFOR»
+						Â«ENDFORÂ»	
+					Â«ENDFORÂ»
 				}
 				public void setItems() {
-					«FOR a : room.roomAttributes.filter(RoomAttribute).filter(ItemList)»
-						«FOR b: a.itemList.filter(Item)»
-							items.add(new «b.name.toFirstUpper»());	
-						«ENDFOR»	
-					«ENDFOR»
-					«FOR a : room.roomAttributes.filter(RoomAttribute).filter(WeaponList)»
-						«FOR b: a.weaponsList.filter(Weapon)»
-							items.add(new «b.name.toFirstUpper»());	
-						«ENDFOR»	
-					«ENDFOR»
+					Â«FOR a : room.roomAttributes.filter(RoomAttribute).filter(ItemList)Â»
+						Â«FOR b: a.itemList.filter(Item)Â»
+							items.add(new Â«b.name.toFirstUpperÂ»());	
+						Â«ENDFORÂ»	
+					Â«ENDFORÂ»
+					Â«FOR a : room.roomAttributes.filter(RoomAttribute).filter(WeaponList)Â»
+						Â«FOR b: a.weaponsList.filter(Weapon)Â»
+							items.add(new Â«b.name.toFirstUpperÂ»());	
+						Â«ENDFORÂ»	
+					Â«ENDFORÂ»
 				}
 			}
 		'''
@@ -270,15 +196,15 @@ class MyDslGenerator extends AbstractGenerator {
 	def CharSequence itemCompile(Item item) {
 		'''
 			package gameDSL;
-			public class «item.name.toFirstUpper» extends Item {
+			public class Â«item.name.toFirstUpperÂ» extends Item {
 				
-				public «item.name.toFirstUpper»() {
-					super("«item.entityName.value»"
-					«FOR a : item.attributes.filter(Attribute).filter(Weight)»
-						«IF a!==null»
-							, «a.weight»
-						«ENDIF»
-					«ENDFOR»
+				public Â«item.name.toFirstUpperÂ»() {
+					super("Â«item.entityNameÂ»"
+					Â«FOR a : item.attributes.filter(EntityAttribute).filter(Weight)Â»
+						Â«IF a!==nullÂ»
+							, Â«a.weightÂ»
+						Â«ENDIFÂ»
+					Â«ENDFORÂ»
 					);
 			
 				}
@@ -289,19 +215,19 @@ class MyDslGenerator extends AbstractGenerator {
 	def CharSequence weaponCompile(Weapon weapon) {
 		'''
 			package gameDSL;
-			public class «weapon.name.toFirstUpper» extends Weapon {
+			public class Â«weapon.name.toFirstUpperÂ» extends Weapon {
 				
-				public «weapon.name.toFirstUpper»() {
-					super("«weapon.entityName.value»", 
-					«FOR a : weapon.attributes.filter(Attribute).filter(Weight)»
-						«a.weight»
-					«ENDFOR»,
-					«FOR a : weapon.attributes.filter(Attribute).filter(Damage)»
-						«a.damage»
-					«ENDFOR»,
-					«FOR a : weapon.attributes.filter(Attribute).filter(Durability)»
-						«a.durability»
-					«ENDFOR»
+				public Â«weapon.name.toFirstUpperÂ»() {
+					super("Â«weapon.entityNameÂ»", 
+					Â«FOR a : weapon.attributes.filter(EntityAttribute).filter(Weight)Â»
+						Â«a.weightÂ»
+					Â«ENDFORÂ»,
+					Â«FOR a : weapon.attributes.filter(EntityAttribute).filter(Damage)Â»
+						Â«a.damageÂ»
+					Â«ENDFORÂ»,
+					Â«FOR a : weapon.attributes.filter(EntityAttribute).filter(Durability)Â»
+						Â«a.durabilityÂ»
+					Â«ENDFORÂ»
 					);
 				
 				}
@@ -312,10 +238,10 @@ class MyDslGenerator extends AbstractGenerator {
 	def CharSequence npcCompile(NPC npc) {
 		'''
 			package gameDSL;
-			public class «npc.name.toFirstUpper» extends NPC {
+			public class Â«npc.name.toFirstUpperÂ» extends NPC {
 				
-				public «npc.name.toFirstUpper»(Room currentRoom) {
-					super(currentRoom, "«npc.entityName.value»");
+				public Â«npc.name.toFirstUpperÂ»(Room currentRoom) {
+					super(currentRoom, "Â«npc.entityNameÂ»");
 				}
 			}
 		'''
@@ -324,24 +250,24 @@ class MyDslGenerator extends AbstractGenerator {
 	def CharSequence hostileNpcCompile(HostileNPC hostileNpc) {
 		'''
 			package gameDSL;
-			public class «hostileNpc.name.toFirstUpper» extends HostileNPC {
+			public class Â«hostileNpc.name.toFirstUpperÂ» extends HostileNPC {
 				
-				public «hostileNpc.name.toFirstUpper»(Room currentRoom) {
-					super(currentRoom, "«hostileNpc.entityName.value»", 
-					«FOR a : hostileNpc.attributes.filter(Attribute).filter(Escapeable)»
-						«a.escapeable»
-					«ENDFOR»,
-					«FOR a : hostileNpc.attributes.filter(Attribute).filter(Health)»
-						«a.health.value»
-					«ENDFOR»,
-					«FOR a : hostileNpc.attributes.filter(Attribute).filter(Damage)»
-						«a.damage»
-					«ENDFOR»
-					«FOR a : hostileNpc.attributes.filter(Attribute).filter(Aggressive)»
-						«IF a.aggressive»
+				public Â«hostileNpc.name.toFirstUpperÂ»(Room currentRoom) {
+					super(currentRoom, "Â«hostileNpc.entityNameÂ»", 
+					Â«FOR a : hostileNpc.attributes.filter(EntityAttribute).filter(Escapeable)Â»
+						Â«a.escapeableÂ»
+					Â«ENDFORÂ»,
+					Â«FOR a : hostileNpc.attributes.filter(EntityAttribute).filter(Health)Â»
+						Â«a.health.valueÂ»
+					Â«ENDFORÂ»,
+					Â«FOR a : hostileNpc.attributes.filter(EntityAttribute).filter(Damage)Â»
+						Â«a.damageÂ»
+					Â«ENDFORÂ»
+					Â«FOR a : hostileNpc.attributes.filter(EntityAttribute).filter(Aggressive)Â»
+						Â«IF a.aggressiveÂ»
 							, true
-						«ENDIF»
-					«ENDFOR»);
+						Â«ENDIFÂ»
+					Â«ENDFORÂ»);
 				
 				}
 			}
@@ -351,33 +277,34 @@ class MyDslGenerator extends AbstractGenerator {
 	def CharSequence playerCompile(Player player) {
 		'''
 			package gameDSL;
-			public class «player.name.toFirstUpper» extends Player {
+			public class Â«player.name.toFirstUpperÂ» extends Player {
 				
-				public «player.name.toFirstUpper»(Room currentRoom) {
-					super(currentRoom, "«player.entityName.value»", «FOR a : player.attributes.filter(Attribute).filter(Health)»
-																																											«a.health.value»
-					«ENDFOR»,
-					«FOR a : player.attributes.filter(Attribute).filter(CarryCapacity)»
-						«a.carryCapacity»
-					«ENDFOR»);
+				public Â«player.name.toFirstUpperÂ»(Room currentRoom) {
+					super(currentRoom, "Â«player.entityNameÂ»", Â«FOR a : player.attributes.filter(EntityAttribute).filter(Health)Â»
+																																										Â«a.health.valueÂ»
+					Â«ENDFORÂ»,
+					Â«FOR a : player.attributes.filter(EntityAttribute).filter(CarryCapacity)Â»
+						Â«a.carryCapacityÂ»
+					Â«ENDFORÂ»);
 				}
 			}
 		'''
 	}
 
 	def CharSequence mainCompile(GameWorld gameWorld) {
-		'''
+			'''
 			package gameDSL;
 			
 			public class Main {
 			    public static void main(String[] argv) {
-			        Game g = new Game("«gameWorld.name»");
+			        Game g = new Game("Â«gameWorld.nameÂ»");
 			        g.play();
 			    }
 			}
-		'''
+			'''
 	}
 
+/*
 	// def generateJavaFile()
 	def String generate(GameWorld world) {
 		world.elements.generateElements
@@ -388,7 +315,7 @@ class MyDslGenerator extends AbstractGenerator {
 
 	def dispatch playerGenerator(Player player) {
 	}
-
+*/
 	// logic dispatchers
 	def dispatch CharSequence generateLogicExp(And exp) {
 		exp.left.generateLogicExp + "&&" + exp.right.generateLogicExp
@@ -408,8 +335,8 @@ class MyDslGenerator extends AbstractGenerator {
 
 	def dispatch CharSequence generateMExp(Div exp) { exp.left.generateMExp + "/" + exp.right.generateMExp }
 
-	def dispatch CharSequence generateMExp(Var exp) '''this._«exp.attribute»'''
+	def dispatch CharSequence generateMExp(Var exp) '''this._Â«exp.attributeÂ»'''
 
-	def dispatch CharSequence generateMExp(Constant exp) '''«exp.value»'''
+	def dispatch CharSequence generateMExp(Constant exp) '''Â«exp.valueÂ»'''
 
 }
