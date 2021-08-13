@@ -37,11 +37,6 @@ import org.xtext.example.mydsl.myDsl.WeaponList
 import org.xtext.example.mydsl.myDsl.Weight
 import org.xtext.example.mydsl.myDsl.GameEntity
 
-/**
- * Generates code from your model files on save.
- * 
- * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#code-generation
- */
 class MyDslGenerator extends AbstractGenerator {
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
@@ -73,9 +68,6 @@ class MyDslGenerator extends AbstractGenerator {
 			fsa.generateFile("gameDSL/Main.java", e.mainCompile)
 		}
 
-	/*val GameGenerator = resource.allContents.filter(GameWorld).next
-
-	 System::out.println(GameGenerator.generate)*/
 	}
 
 	def CharSequence gentityGeneratorCompile(GameWorld gameWorld) {
