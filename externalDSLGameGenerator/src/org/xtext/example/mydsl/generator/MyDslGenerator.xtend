@@ -95,8 +95,8 @@ class MyDslGenerator extends AbstractGenerator {
 					ArrayList<Room> rooms = new ArrayList<>();
 					
 			«FOR a : gameWorld.elements.filter(Element).filter(GameEntity)»
-				«IF a.type instanceof Room»
-					rooms.add(«a.type.name.toFirstUpper».getInstance());
+				«IF a instanceof Room»
+					rooms.add(«a.name.toFirstUpper».getInstance());
 				«ENDIF»
 			«ENDFOR»
 			
@@ -112,8 +112,8 @@ class MyDslGenerator extends AbstractGenerator {
 			         ArrayList<Player> players = new ArrayList<>();
 			         
 			«FOR a : gameWorld.elements.filter(Element).filter(GameEntity)»
-				«IF a.type instanceof Room»
-					«var room = a.type as Room»
+				«IF a instanceof Room»
+					«var room = a as Room»
 						«FOR b : room.roomAttributes.filter(PlayerList)»
 							«FOR c : b.playerList»
 								players.add(new «c.name.toFirstUpper»(«room.name.toFirstUpper».getInstance()));
@@ -129,8 +129,8 @@ class MyDslGenerator extends AbstractGenerator {
 			         ArrayList<NPC> npcs = new ArrayList<>();
 			         
 			«FOR a : gameWorld.elements.filter(Element).filter(GameEntity)»
-				«IF a.type instanceof Room»
-					«var room = a.type as Room»
+				«IF a instanceof Room»
+					«var room = a as Room»
 						«FOR b : room.roomAttributes.filter(NPCList)»
 							«FOR c : b.npcList»
 								npcs.add(new «c.name.toFirstUpper»(«room.name.toFirstUpper».getInstance()));
@@ -167,7 +167,7 @@ class MyDslGenerator extends AbstractGenerator {
 				
 				public void setPaths() {
 					«FOR a : room.roomAttributes.filter(RoomAttribute).filter(PathList)»
-						«FOR b: a.pathList.filter(Path)»
+						«FOR b: a.paths.filter(Path)»
 							paths.add(new Path(«b.toType.name.toFirstUpper».getInstance(),					
 							"«b.entityName»"
 							«IF b.requireItem!==null»

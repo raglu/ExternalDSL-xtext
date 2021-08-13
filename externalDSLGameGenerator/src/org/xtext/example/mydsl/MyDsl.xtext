@@ -18,22 +18,22 @@ RoomAttribute:
 	PathList | ItemList | NPCList | WeaponList | HostileNPCList | PlayerList;
 
 PathList:
-	'paths' '=' pathList+=Path (','? pathList+=Path)*;
+	'paths' ':' paths+=Path (','? paths+=Path)*;
 
 ItemList:
-	'items' '=' itemList+=[Item] (','? itemList+=[Item])*;
+	'items' ':' itemList+=[Item] (','? itemList+=[Item])*;
 
 WeaponList:
-	'weapons' '=' weaponsList+=[Weapon] (','? weaponsList+=[Weapon])*;
+	'weapons' ':' weaponsList+=[Weapon] (','? weaponsList+=[Weapon])*;
 
 NPCList:
-	'npcs' '=' npcList+=[NPC] (','? npcList+=[NPC])*;
+	'npcs' ':' npcList+=[NPC] (','? npcList+=[NPC])*;
 
 HostileNPCList:
-	'hostileNpcs' '=' hostileNPCList+=[HostileNPC] (','? hostileNPCList+=[HostileNPC])*;
+	'hostileNpcs' ':' hostileNPCList+=[HostileNPC] (','? hostileNPCList+=[HostileNPC])*;
 
 PlayerList:
-	'players' '=' playerList+=[Player] (','? playerList+=[Player])*;
+	'players' ':' playerList+=[Player] (','? playerList+=[Player])*;
 
 Path:
 	toType=[Room]
@@ -64,7 +64,7 @@ EntityAttribute:
 	Health | Weight | Damage | Durability | CarryCapacity | Escapeable | Aggressive;
 
 Health:
-	'health' '=' health=Constant;
+	'health' '=' health=INT;
 
 Weight:
 	'weight' '=' weight=INT;
@@ -99,10 +99,13 @@ Rule:
 ;
 
 ConditionalRule:
-	'if' Condition+=Logic 'then' action+=Action;
+	'if' condition+=Logic 'then' action+=Action;
 
 TimeRule:
 	'time' '=' time=INT;
+
+ConditionalAction:
+	'if' Comparison 'then' action=Action ('=' newValue=INT)?;
 
 Action:
 	value=STRING;
@@ -118,24 +121,11 @@ PrimLogic returns LogicExp:
 	Comparison | '[' logic=Logic ']';
 
 Comparison:
-	left=Exp op=CompareOp right=Exp;
+	left=Var op=CompareOp right=Var;
 
 CompareOp:
 	'<' | '>' | '==' | '<=' | '>=';
 
-Exp returns Expression:
-	Factor (('+' {Plus.left=current} | '-' {Minus.left=current}) right=Factor)*;
-
-Factor returns Expression:
-	PrimExp (('*' {Mult.left=current} | '/' {Div.left=current}) right=PrimExp)*;
-
-PrimExp returns Expression:
-//	Var | Constant | '(' exp=Exp ')';
-	Constant | '(' exp=Exp ')';
-	
-//Var:
-//	type=[Type] '.' attribute=ID // [Attribute] istedet for ID
-//;
-
-Constant:
-	value=INT;
+Var:
+	type=[GameEntity] '.' attribute=ID // [Attribute] istedet for ID
+;

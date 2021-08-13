@@ -3,6 +3,11 @@
  */
 package org.xtext.example.mydsl.scoping
 
+import org.eclipse.emf.ecore.EObject
+import org.eclipse.emf.ecore.EReference
+import org.eclipse.xtext.scoping.IScope
+import org.xtext.example.mydsl.myDsl.Player
+import org.xtext.example.mydsl.myDsl.MyDslPackage.Literals
 
 /**
  * This class contains custom scoping description.
@@ -11,5 +16,14 @@ package org.xtext.example.mydsl.scoping
  * on how and when to use it.
  */
 class MyDslScopeProvider extends AbstractMyDslScopeProvider {
+
+	override IScope getScope(EObject context, EReference reference) {
+		
+//		switch context{
+//			Player case reference==Literals.Pla
+//		}
+		
+		super.getScope(context, reference)
+	}
 
 }
