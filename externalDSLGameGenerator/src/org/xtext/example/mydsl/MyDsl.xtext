@@ -15,25 +15,16 @@ Room:
 	'room' name=ID entityName=STRING roomAttributes+=RoomAttribute*;
 
 RoomAttribute:
-	PathList | ItemList | NPCList | WeaponList | HostileNPCList | PlayerList;
+	PathList | ReferenceList;
 
 PathList:
 	'paths' ':' paths+=Path (','? paths+=Path)*;
 
-ItemList:
-	'items' ':' itemList+=[Item] (','? itemList+=[Item])*;
+ReferenceList:
+	'entites' ':' references+=Reference (','? references+=Reference)*;
 
-WeaponList:
-	'weapons' ':' weaponsList+=[Weapon] (','? weaponsList+=[Weapon])*;
-
-NPCList:
-	'npcs' ':' npcList+=[NPC] (','? npcList+=[NPC])*;
-
-HostileNPCList:
-	'hostileNpcs' ':' hostileNPCList+=[HostileNPC] (','? hostileNPCList+=[HostileNPC])*;
-
-PlayerList:
-	'players' ':' playerList+=[Player] (','? playerList+=[Player])*;
+Reference:
+	reference=[Item] | reference=[Weapon] | reference=[NPC] | reference=[HostileNPC] | reference=[Player];
 
 Path:
 	toType=[Room]
