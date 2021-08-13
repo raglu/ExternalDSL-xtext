@@ -12,9 +12,7 @@ import org.xtext.example.mydsl.myDsl.And
 import org.xtext.example.mydsl.myDsl.EntityAttribute
 import org.xtext.example.mydsl.myDsl.CarryCapacity
 import org.xtext.example.mydsl.myDsl.Comparison
-import org.xtext.example.mydsl.myDsl.Constant
 import org.xtext.example.mydsl.myDsl.Damage
-import org.xtext.example.mydsl.myDsl.Div
 import org.xtext.example.mydsl.myDsl.Durability
 import org.xtext.example.mydsl.myDsl.Element
 import org.xtext.example.mydsl.myDsl.Escapeable
@@ -24,8 +22,6 @@ import org.xtext.example.mydsl.myDsl.HostileNPC
 import org.xtext.example.mydsl.myDsl.HostileNPCList
 import org.xtext.example.mydsl.myDsl.Item
 import org.xtext.example.mydsl.myDsl.ItemList
-import org.xtext.example.mydsl.myDsl.Minus
-import org.xtext.example.mydsl.myDsl.Mult
 import org.xtext.example.mydsl.myDsl.NPC
 import org.xtext.example.mydsl.myDsl.NPCList
 import org.xtext.example.mydsl.myDsl.Or
@@ -33,7 +29,6 @@ import org.xtext.example.mydsl.myDsl.Path
 import org.xtext.example.mydsl.myDsl.PathList
 import org.xtext.example.mydsl.myDsl.Player
 import org.xtext.example.mydsl.myDsl.PlayerList
-import org.xtext.example.mydsl.myDsl.Plus
 import org.xtext.example.mydsl.myDsl.Room
 import org.xtext.example.mydsl.myDsl.RoomAttribute
 import org.xtext.example.mydsl.myDsl.Var
@@ -258,7 +253,7 @@ class MyDslGenerator extends AbstractGenerator {
 						«a.escapeable»
 					«ENDFOR»,
 					«FOR a : hostileNpc.attributes.filter(EntityAttribute).filter(Health)»
-						«a.health.value»
+						«a.health»
 					«ENDFOR»,
 					«FOR a : hostileNpc.attributes.filter(EntityAttribute).filter(Damage)»
 						«a.damage»
@@ -273,7 +268,7 @@ class MyDslGenerator extends AbstractGenerator {
 			}
 		'''
 	}
-
+	
 	def CharSequence playerCompile(Player player) {
 		'''
 			package gameDSL;
@@ -281,7 +276,7 @@ class MyDslGenerator extends AbstractGenerator {
 				
 				public «player.name.toFirstUpper»(Room currentRoom) {
 					super(currentRoom, "«player.entityName»", «FOR a : player.attributes.filter(EntityAttribute).filter(Health)»
-																																										«a.health.value»
+						«a.health»
 					«ENDFOR»,
 					«FOR a : player.attributes.filter(EntityAttribute).filter(CarryCapacity)»
 						«a.carryCapacity»
@@ -327,16 +322,6 @@ class MyDslGenerator extends AbstractGenerator {
 		exp.left.generateMExp + exp.op + exp.right.generateMExp
 	}
 
-	def dispatch CharSequence generateMExp(Plus exp) { exp.left.generateMExp + "+" + exp.right.generateMExp }
-
-	def dispatch CharSequence generateMExp(Minus exp) { exp.left.generateMExp + "-" + exp.right.generateMExp }
-
-	def dispatch CharSequence generateMExp(Mult exp) { exp.left.generateMExp + "*" + exp.right.generateMExp }
-
-	def dispatch CharSequence generateMExp(Div exp) { exp.left.generateMExp + "/" + exp.right.generateMExp }
-
 	def dispatch CharSequence generateMExp(Var exp) '''this._«exp.attribute»'''
-
-	def dispatch CharSequence generateMExp(Constant exp) '''«exp.value»'''
 
 }
