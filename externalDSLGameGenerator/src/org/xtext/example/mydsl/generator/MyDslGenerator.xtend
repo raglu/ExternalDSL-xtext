@@ -32,6 +32,7 @@ import org.xtext.example.mydsl.myDsl.Weight
 import org.xtext.example.mydsl.myDsl.GameRoom
 import org.xtext.example.mydsl.myDsl.GameRules
 import org.xtext.example.mydsl.myDsl.EntityAttribute
+import org.xtext.example.mydsl.myDsl.Attribute
 
 class MyDslGenerator extends AbstractGenerator {
 
