@@ -6,8 +6,6 @@ package org.xtext.example.mydsl.scoping
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
 import org.eclipse.xtext.scoping.IScope
-import org.xtext.example.mydsl.myDsl.Player
-import org.xtext.example.mydsl.myDsl.MyDslPackage.Literals
 
 /**
  * This class contains custom scoping description.

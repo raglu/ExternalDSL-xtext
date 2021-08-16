@@ -15,6 +15,12 @@ import org.xtext.example.mydsl.myDsl.Player
 import org.xtext.example.mydsl.myDsl.Weight
 import org.xtext.example.mydsl.myDsl.HostileNPC
 import org.xtext.example.mydsl.myDsl.Weapon
+import org.xtext.example.mydsl.myDsl.Damage
+import org.xtext.example.mydsl.myDsl.Aggressive
+import org.xtext.example.mydsl.myDsl.EntityAttribute
+import org.xtext.example.mydsl.myDsl.GameWorld
+import org.xtext.example.mydsl.myDsl.Element
+import org.xtext.example.mydsl.myDsl.GameRules
 
 /**
  * This class contains custom validation rules. 
@@ -23,78 +29,95 @@ import org.xtext.example.mydsl.myDsl.Weapon
  */
 class MyDslValidator extends AbstractMyDslValidator {
 
-//	public static val INVALID_NAME = 'invalidName'
-//
-//	@Check
-//	def checkGreetingStartsWithCapital(Greeting greeting) {
-//		if (!Character.isUpperCase(greeting.name.charAt(0))) {
-//			warning('Name should start with a capital', 
-//					MyDslPackage.Literals.GREETING__NAME,
-//					INVALID_NAME)
-//		}
-//	}
+	@Check
+	def checkPlayerAttribute(Player player) {
+
+		val missingAttributes = newArrayList("health", "carryCapacity")
+
+		for (EntityAttribute ea : player.attributes) {
+			if (ea instanceof Health)
+				missingAttributes -= "health"
+			if (ea instanceof CarryCapacity)
+				missingAttributes -= "carryCapacity"
+		}
+
+		if (! missingAttributes.isEmpty())
+			error("Player entity needs following attributes: " + missingAttributes,
+				MyDslPackage.eINSTANCE.player_PlayerType)
+	}
+
 	@Check
 	def checkItemAttribute(Item item) {
 
-		item.attributes.forEach [
-			if (it instanceof Health)
-				error("Items do not have health try durability instead ", MyDslPackage.eINSTANCE.item_ItemType)
-			if (it instanceof CarryCapacity)
-				error("Items does not have carry capacity ", MyDslPackage.eINSTANCE.item_ItemType)
-			if (it instanceof Escapeable)
-				error("Items does not have escapeable", MyDslPackage.eINSTANCE.item_ItemType)
-		]
+		val missingAttributes = newArrayList("weight")
+
+		for (EntityAttribute ea : item.attributes) {
+			if (ea instanceof Weight)
+				missingAttributes -= "weight"
+		}
+
+		if (! missingAttributes.isEmpty())
+			error("Item entity needs following attributes: " + missingAttributes, MyDslPackage.eINSTANCE.item_ItemType)
+
 	}
 
 	@Check
 	def checkWeaponAttributes(Weapon weapon) {
 
-		weapon.attributes.forEach [
-			if (it instanceof Health)
-				error("Weapons do not have health try durability instead ", MyDslPackage.eINSTANCE.weapon_WeaponType)
-			if (it instanceof CarryCapacity)
-				error("Weapons does not have carry capacity ", MyDslPackage.eINSTANCE.weapon_WeaponType)
-			if (it instanceof Escapeable)
-				error("Weapons does not have escapeable", MyDslPackage.eINSTANCE.weapon_WeaponType)
-		]
-	}
+		val missingAttributes = newArrayList("damage", "weight")
 
-	@Check
-	def checkPlayerAttribute(Player player) {
+		for (EntityAttribute ea : weapon.attributes) {
+			if (ea instanceof Damage)
+				missingAttributes -= "damage"
+			if (ea instanceof Weight)
+				missingAttributes -= "weight"
+		}
 
-		player.attributes.forEach [
-			if (it instanceof Weight)
-				error("Player does not have weight ", MyDslPackage.eINSTANCE.player_PlayerType)
-			if (it instanceof Durability)
-				error("Player does not have Durability", MyDslPackage.eINSTANCE.player_PlayerType)
-			if (it instanceof Escapeable)
-				error("Player does not have Escapeable", MyDslPackage.eINSTANCE.player_PlayerType)
-		]
+		if (! missingAttributes.isEmpty())
+			error("Weapon entity needs following attributes: " + missingAttributes,
+				MyDslPackage.eINSTANCE.weapon_WeaponType)
+
 	}
 
 	@Check
 	def checkNPCAttribute(NPC npc) {
-
-		npc.attributes.forEach [
-			if (it instanceof Weight)
-				error("NPC does not have weight ", MyDslPackage.eINSTANCE.NPC_NpcType)
-			if (it instanceof Durability)
-				error("NPC does not have Durability", MyDslPackage.eINSTANCE.NPC_NpcType)
-			if (it instanceof CarryCapacity)
-				error("NPC does not have CarryCapacity", MyDslPackage.eINSTANCE.NPC_NpcType)
-		]
 	}
 
 	@Check
 	def checkHostileNPCAttribute(HostileNPC hostileNPC) {
 
-		hostileNPC.attributes.forEach [
-			if (it instanceof Weight)
-				error("HostileNPC does not have weight ", MyDslPackage.eINSTANCE.hostileNPC_HostileNpcType)
-			if (it instanceof Durability)
-				error("HostileNPC does not have Durability", MyDslPackage.eINSTANCE.hostileNPC_HostileNpcType)
-			if (it instanceof CarryCapacity)
-				error("HostileNPC does not have CarryCapacity", MyDslPackage.eINSTANCE.hostileNPC_HostileNpcType)
-		]
+		val missingAttributes = newArrayList("health", "damage", "escapeable")
+
+		for (EntityAttribute ea : hostileNPC.attributes) {
+			if (ea instanceof Health)
+				missingAttributes -= "health"
+			if (ea instanceof Damage)
+				missingAttributes -= "damage"
+			if (ea instanceof Escapeable)
+				missingAttributes -= "escapeable"
+		}
+
+		if (! missingAttributes.isEmpty())
+			error("HostileNPC entity needs following attributes: " + missingAttributes,
+				MyDslPackage.eINSTANCE.hostileNPC_HostileNpcType)
+
 	}
+
+	@Check
+	def checkGameRulesInstances(GameWorld gameWorld) {
+
+		var instances = 0
+
+		for (Element e : gameWorld.elements) {
+			if (e instanceof GameRules)
+				instances++
+
+		}
+
+		if (instances > 1) {
+			error("Too many GameRules. Use only one instance to list all your rules",
+				MyDslPackage.eINSTANCE.gameWorld_Name)
+		}
+	}
+
 }

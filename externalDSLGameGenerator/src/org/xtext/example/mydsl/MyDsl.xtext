@@ -6,19 +6,25 @@ GameWorld:
 	'GameWorld' name=STRING elements+=Element*;
 
 Element:
-	GameRules | GameEntity;
+	 GameRoom | GameEntity | GameRules;
 
-GameEntity:
-	Room | Item | Weapon | NPC | HostileNPC | Player;
 
-Room:
+GameRoom:
 	'room' name=ID entityName=STRING roomAttributes+=RoomAttribute*;
 
 RoomAttribute:
-	PathList | ItemList | NPCList | WeaponList | HostileNPCList | PlayerList;
+	PathList | PlayerList | ItemList | NPCList | WeaponList | HostileNPCList;
 
 PathList:
 	'paths' ':' paths+=Path (','? paths+=Path)*;
+
+Path:
+	toType=[GameRoom]
+	'through' entityName=STRING
+	('requires' requireItem=[Item])?;
+
+PlayerList:
+	'players' ':' playerList+=[Player] (','? playerList+=[Player])*;
 
 ItemList:
 	'items' ':' itemList+=[Item] (','? itemList+=[Item])*;
@@ -32,13 +38,12 @@ NPCList:
 HostileNPCList:
 	'hostileNpcs' ':' hostileNPCList+=[HostileNPC] (','? hostileNPCList+=[HostileNPC])*;
 
-PlayerList:
-	'players' ':' playerList+=[Player] (','? playerList+=[Player])*;
+GameEntity:
+	Player | Item | Weapon | NPC | HostileNPC;
 
-Path:
-	toType=[Room]
-	'through' entityName=STRING
-	'requires'? requireItem=[Item]?;
+Player:
+	'player' name=ID entityName=STRING (':' playerType=[Player])?
+	attributes+=EntityAttribute*;
 
 Item:
 	'item' name=ID entityName=STRING (':' itemType=[Item])?
@@ -46,10 +51,6 @@ Item:
 
 Weapon:
 	'weapon' name=ID entityName=STRING (':' weaponType=[Weapon])?
-	attributes+=EntityAttribute*;
-
-Player:
-	'player' name=ID entityName=STRING (':' playerType=[Player])?
 	attributes+=EntityAttribute*;
 
 NPC:
@@ -61,7 +62,7 @@ HostileNPC:
 	attributes+=EntityAttribute*;
 
 EntityAttribute:
-	Health | Weight | Damage | Durability | CarryCapacity | Escapeable | Aggressive;
+	Health | Weight | Damage | Durability | CarryCapacity | Escapeable | Aggressive | Attribute;
 
 Health:
 	'health' '=' health=INT;
@@ -84,48 +85,28 @@ Escapeable:
 Aggressive:
 	'aggressive' '=' (aggressive?='true' | aggressive?='false');
 
+Attribute:
+	name=ID '=' (stringValue=STRING | intValue=INT);
+
 GameRules:
-	{GameRule} 'GameRules:' rules+=Rule*;
+	{GameRules} 'GameRules:' rules+=Rule*;
 
 Rule:
 	ConditionalRule | TimeRule
-/*
- * 
- * Player '.' Var=health <= 0) then GameOver' |
- * 'if(Time <= 0) then GameOver' |
- * 'if(WinCondition == true) then GameOver' |
- * 'if(Item.durability <= 0) then remove Item' |
- 'WinCondition = reach northern_tower_level_2 && carry key */
 ;
-
-ConditionalRule:
-	'if' condition+=Logic 'then' action+=Action;
 
 TimeRule:
 	'time' '=' time=INT;
 
-ConditionalAction:
-	'if' Comparison 'then' action=Action ('=' newValue=INT)?;
+ConditionalRule:
+	'if' condition+=Condition 'then' (action=STRING | assignment=STRING '=' (newInt=INT | newString=STRING));
 
-Action:
-	value=STRING;
-
-//Logic Expressions
-Logic returns LogicExp:
-	Conjunction ('||' {Or.left=current} right=Conjunction)*;
-
-Conjunction returns LogicExp:
-	PrimLogic ('&&' {And.left=current} right=PrimLogic)*;
-
-PrimLogic returns LogicExp:
-	Comparison | '[' logic=Logic ']';
-
-Comparison:
+Condition:
 	left=Var op=CompareOp right=Var;
 
 CompareOp:
 	'<' | '>' | '==' | '<=' | '>=';
 
 Var:
-	type=[GameEntity] '.' attribute=ID // [Attribute] istedet for ID
+	type=[GameEntity] '.' attribute=ID | value=INT
 ;
