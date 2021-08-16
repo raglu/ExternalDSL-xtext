@@ -6,8 +6,8 @@ GameWorld:
 	'GameWorld' name=STRING elements+=Element*;
 
 Element:
-	 GameRoom | GameEntity | GameRules;
-	 
+	GameRoom | GameEntity | GameRules;
+
 GameRoom:
 	'room' name=ID entityName=STRING roomAttributes+=RoomAttribute*;
 
@@ -91,8 +91,7 @@ GameRules:
 	{GameRules} 'GameRules:' rules+=Rule*;
 
 Rule:
-	ConditionalRule | TimeRule
-;
+	ConditionalRule | TimeRule;
 
 TimeRule:
 	'time' '=' time=INT;
@@ -107,5 +106,4 @@ CompareOp:
 	'<' | '>' | '==' | '<=' | '>=';
 
 Var:
-	type=[GameEntity] '.' attribute=ID | value=INT
-;
+	type=[GameEntity] '.' attribute=ID | value=INT;
