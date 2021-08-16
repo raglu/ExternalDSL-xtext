@@ -8,7 +8,6 @@ import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
 import org.xtext.example.mydsl.myDsl.Aggressive
-import org.xtext.example.mydsl.myDsl.EntityAttribute
 import org.xtext.example.mydsl.myDsl.CarryCapacity
 import org.xtext.example.mydsl.myDsl.Damage
 import org.xtext.example.mydsl.myDsl.Durability
@@ -32,7 +31,7 @@ import org.xtext.example.mydsl.myDsl.WeaponList
 import org.xtext.example.mydsl.myDsl.Weight
 import org.xtext.example.mydsl.myDsl.GameRoom
 import org.xtext.example.mydsl.myDsl.GameRules
-import org.xtext.example.mydsl.myDsl.Attribute
+import org.xtext.example.mydsl.myDsl.EntityAttribute
 
 class MyDslGenerator extends AbstractGenerator {
 

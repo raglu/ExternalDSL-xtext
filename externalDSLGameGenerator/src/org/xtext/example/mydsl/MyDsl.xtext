@@ -7,8 +7,7 @@ GameWorld:
 
 Element:
 	 GameRoom | GameEntity | GameRules;
-
-
+	 
 GameRoom:
 	'room' name=ID entityName=STRING roomAttributes+=RoomAttribute*;
 
